@@ -1,0 +1,101 @@
+[
+  {
+    "id": 1,
+    "title": "Mesa de comedor Wanama",
+    "description": "Mesa de comedor de madera rectangular",
+    "price": 95000,
+    "thumbnail": "Sin imagen",
+    "code": "abc122",
+    "stock": 15
+  },
+  {
+    "id": 2,
+    "title": "Mesa de comedor Diana",
+    "description": "Mesa de comedor de madera rectangular",
+    "price": 90000,
+    "thumbnail": "Sin imagen",
+    "code": "abc123",
+    "stock": 25
+  },
+  {
+    "id": 3,
+    "title": "Mesa de comedor Fiorella",
+    "description": "Mesa de comedor de madera rectangular",
+    "price": 80000,
+    "thumbnail": "Sin imagen",
+    "code": "abc124",
+    "stock": 7
+  },
+  {
+    "id": 4,
+    "title": "Mesa de centro Madison",
+    "description": "Mesa de centro de madera ovalada",
+    "price": 21500,
+    "thumbnail": "Sin imagen",
+    "code": "abc125",
+    "stock": 6
+  },
+  {
+    "id": 5,
+    "title": "Mesa de centro Sofía",
+    "description": "Mesa de centro de madera ovalada",
+    "price": 23700,
+    "thumbnail": "Sin imagen",
+    "code": "abc126",
+    "stock": 13
+  },
+  {
+    "id": 6,
+    "title": "Mesa de centro Italy",
+    "description": "Mesa de centro de madera ovalada",
+    "price": 19500,
+    "thumbnail": "Sin imagen",
+    "code": "abc127",
+    "stock": 14
+  },
+  {
+    "id": 7,
+    "title": "Silla Luis XIV",
+    "description": "Silla",
+    "price": 9500,
+    "thumbnail": "Sin imagen",
+    "code": "abc128",
+    "stock": 17
+  },
+  {
+    "id": 8,
+    "title": "Silla matera",
+    "description": "Silla",
+    "price": 7500,
+    "thumbnail": "Sin imagen",
+    "code": "abc129",
+    "stock": 8
+  },
+  {
+    "id": 9,
+    "title": "Silla Gervasoni",
+    "description": "Silla",
+    "price": 23500,
+    "thumbnail": "Sin imagen",
+    "code": "abc130",
+    "stock": 2
+  },
+  {
+    "id": 10,
+    "title": "Silla Jeanneret",
+    "description": "Silla",
+    "price": 20500,
+    "thumbnail": "Sin imagen",
+    "code": "abc131",
+    "stock": 6
+  },
+  {
+    "id": 11,
+    "title": "Silla Eames",
+    "description": "Silla",
+    "price": 5000,
+    "thumbnail": "Sin imagen",
+    "code": "abc132",
+    "stock": 12
+  }
+]

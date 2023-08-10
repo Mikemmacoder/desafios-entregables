@@ -1,7 +1,7 @@
-const fs = require("fs");
+import fs from "fs";
 
 // ----- Creo la clase -----
-class ProductManager {
+export class ProductManager {
   constructor(path) {
     if (!path || typeof path !== "string") {
       throw new Error(
@@ -11,11 +11,11 @@ class ProductManager {
       this.myArray = [];
       this.productIdCounter = 1;
       this.path = path;
-      fs.writeFileSync(this.path, JSON.stringify(this.myArray));
     }
   }
   // ----- Método agregar productos-----
-  addProduct(title, description, price, thumbnail, code, stock) {
+  addProduct(product) {
+    const { title, description, price, thumbnail, code, stock } = product;
     if (
       !title ||
       !description ||
@@ -30,7 +30,7 @@ class ProductManager {
       return;
     }
 
-    let product = {
+    let newProduct = {
       id: this.productIdCounter,
       title,
       description,
@@ -42,20 +42,27 @@ class ProductManager {
 
     let file = fs.readFileSync(this.path, "utf-8");
     let products = JSON.parse(file);
-    const found = products.find((el) => el.code === product.code);
+    const found = products.find((el) => el.code === newProduct.code);
     if (found) {
-      console.log("El código " + product.code + " ya existe en ProductManager");
+      console.log(
+        "El código " + newProduct.code + " ya existe en ProductManager"
+      );
     } else {
-      this.myArray.push(product);
-      console.log("Producto agregado correctamente.");
+      this.myArray.push(newProduct);
       this.productIdCounter++;
       fs.writeFileSync(this.path, JSON.stringify(this.myArray));
+      return newProduct;
     }
   }
   getProducts() {
-    if (!fs.existsSync(this.path)) return "Error: el archivo no existe";
+    if (!fs.existsSync(this.path)) {
+      console.log("El archivo no existe");
+      return [];
+    }
+
     let file = fs.readFileSync(this.path, "utf-8");
-    console.log(JSON.parse(file));
+    const products = JSON.parse(file);
+    return products || [];
   }
 
   getProductById(id) {
@@ -64,9 +71,9 @@ class ProductManager {
     this.myArray = JSON.parse(file);
     if (this.myArray.some((el) => el.id == id)) {
       let productFound = this.myArray.filter((el) => el.id == id);
-      console.log(`El producto de id ${id} es ` + productFound[0].title);
+      return productFound;
     } else {
-      console.log("Not found");
+      return "Product id does not exixsts";
     }
   }
 
@@ -74,15 +81,18 @@ class ProductManager {
     if (!fs.existsSync(this.path)) return "Error: el archivo no existe";
     let file = fs.readFileSync(this.path, "utf-8");
     this.myArray = JSON.parse(file);
-    let newProducts = this.myArray.map((el) => {
-      if (el.id !== id) {
-        return `Error: el producto de id ${id} no existe`;
-      } else {
-        return { ...el, ...update };
-      }
-    });
-    fs.writeFileSync(this.path, JSON.stringify(newProducts));
-    console.log(`El producto con id ${id} sa sido actualizado correctamente.`);
+
+    let productToUpdate = this.myArray.find((el) => el.id === id);
+
+    if (!productToUpdate) {
+      console.log(`No se encontró ningún producto con el id ${id}`);
+      return;
+    }
+
+    Object.assign(productToUpdate, update);
+
+    fs.writeFileSync(this.path, JSON.stringify(this.myArray));
+    console.log(`El producto con id ${id} ha sido actualizado correctamente.`);
   }
 
   deleteProductById(id) {
@@ -98,50 +108,44 @@ class ProductManager {
       this.myArray = newArray;
       fs.writeFileSync(this.path, JSON.stringify(newArray));
       console.log(`El elemento de id ${id} ha sido eliminado`);
+      return this.myArray;
     }
+  }
+  // ----- Métodos de escribir y leer archivos-----
+  escribirArchivo() {
+    fs.writeFileSync(this.path, JSON.stringify(this.myArray));
   }
 }
 
 // ----- Instancio la clase -----
-let myProducts = new ProductManager("./ej-path.js");
+/*let myProducts = new ProductManager("./ej-path.js");
 
-myProducts.getProducts();
+console.log(myProducts.getProducts());
+myProducts.addProduct({
+  title: "producto prueba",
+  description: "Este es un producto prueba",
+  price: 200,
+  thumbnail: "Sin imagen",
+  code: "abc123",
+  stock: 25,
+});
+myProducts.addProduct({
+  title: "producto2",
+  description: "Este es un producto2",
+  price: 500,
+  thumbnail: "Sin imagen",
+  code: "abc1241",
+  stock: 214,
+});
+console.log(myProducts.getProducts());
 
-myProducts.addProduct(
-  "producto prueba",
-  "Este es un producto prueba",
-  200,
-  "Sin Image",
-  "abc123",
-  25
-);
-myProducts.getProducts();
-
-myProducts.addProduct(
-  "producto fail1",
-  "Este es un producto prueba que le falta un campo",
-  600,
-  "Sin Image",
-  "abc123"
-);
-
-myProducts.addProduct(
-  "producto fail2",
-  "Este es un producto fail2 por código repetido",
-  600,
-  "Sin Image",
-  "abc123",
-  13
-);
-
-myProducts.getProducts();
-
-myProducts.getProductById(1);
-myProducts.getProductById(2);
+console.log(myProducts.getProductById(1));
+console.log(myProducts.getProductById(2));
 
 myProducts.updateProductById(1, { price: 250 });
-myProducts.getProducts();
+myProducts.updateProductById(2, { price: 750 });
+console.log(myProducts.getProducts());
 
 myProducts.deleteProductById(1);
-myProducts.getProducts();
-myProducts.deleteProductById(2);
+console.log(myProducts.getProducts());
+ */
