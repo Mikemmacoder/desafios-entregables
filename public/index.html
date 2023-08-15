@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clase 8</title>
+  </head>
+  <body>
+    <h1>Hola Mundo!!</h1>
+    <hr />
+    <div>Registra un producto...</div>
+    <hr />
+    <form action="/api/products" method="post">
+      name: <input type="text" name="title" /><br />
+      description: <input type="text" name="description" /><br />
+      code: <input type="text" name="code" /><br />
+      price: <input type="number" name="price" /><br />
+      status: <input type="checkbox" value="true" checked name="status" /><br />
+      stock: <input type="number" name="stock" /><br />
+      category: <input type="text" name="category" /><br />
+      thumbnails: <input type="text" name="thumbnails[]" /><br />
+
+      <input type="submit" value="Registrar producto" />
+    </form>
+  </body>
+</html>

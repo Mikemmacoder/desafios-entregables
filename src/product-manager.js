@@ -15,42 +15,52 @@ export class ProductManager {
   }
   // ----- Método agregar productos-----
   addProduct(product) {
-    const { title, description, price, thumbnail, code, stock } = product;
+    const {
+      title,
+      description,
+      price,
+      thumbnails,
+      code,
+      stock,
+      status,
+      category,
+    } = product;
     if (
       !title ||
       !description ||
       isNaN(price) ||
-      !thumbnail ||
+      //  !thumbnail ||
       !code ||
-      isNaN(stock)
+      isNaN(stock) ||
+      !status ||
+      !category
     ) {
-      console.log(
-        "Error: Todas las propiedades del producto son obligatorias."
-      );
-      return;
+      return "Error: Todas las propiedades del producto son obligatorias.";
     }
-
-    let newProduct = {
-      id: this.productIdCounter,
-      title,
-      description,
-      price: Number(price), // Asegurarse de que el precio sea un número
-      thumbnail,
-      code,
-      stock: Number(stock), // Asegurarse de que el stock sea un número
-    };
-
     let file = fs.readFileSync(this.path, "utf-8");
     let products = JSON.parse(file);
+    let productIdCounter = products.length === 0 ? 1 : products.length + 1;
+
+    let newProduct = {
+      id: productIdCounter,
+      title,
+      description,
+      price: Number(price),
+      thumbnails,
+      code,
+      stock: Number(stock),
+      status: Boolean(status),
+      category,
+    };
+
     const found = products.find((el) => el.code === newProduct.code);
     if (found) {
       console.log(
         "El código " + newProduct.code + " ya existe en ProductManager"
       );
     } else {
-      this.myArray.push(newProduct);
-      this.productIdCounter++;
-      fs.writeFileSync(this.path, JSON.stringify(this.myArray));
+      products.push(newProduct);
+      fs.writeFileSync(this.path, JSON.stringify(products));
       return newProduct;
     }
   }
@@ -62,7 +72,7 @@ export class ProductManager {
 
     let file = fs.readFileSync(this.path, "utf-8");
     const products = JSON.parse(file);
-    return products || [];
+    return products;
   }
 
   getProductById(id) {
