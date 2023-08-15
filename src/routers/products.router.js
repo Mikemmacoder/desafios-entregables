@@ -179,4 +179,30 @@ router.post("/", (req, res) => {
   res.json(product);
 });
 
+router.put("/:id", (req, res) => {
+  const productId = parseInt(req.params.id);
+  const updateFields = req.body;
+  if (updateFields.hasOwnProperty("id")) {
+    return res
+      .status(400)
+      .json({ status: "error", error: "No puedes modificar el campo 'id'." });
+  }
+  productManager.updateProductById(productId, updateFields);
+
+  res.json({
+    status: "success",
+    payload: "Producto actualizado correctamente.",
+  });
+});
+
+router.delete("/:id", (req, res) => {
+  const productId = parseInt(req.params.id);
+  productManager.deleteProductById(productId);
+
+  res.json({
+    status: "success",
+    payload: "Producto eliminado correctamente.",
+  });
+});
+
 export default router;
