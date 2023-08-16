@@ -32,7 +32,7 @@ productManager.addProduct({
   price: 90000,
   thumbnail: "Sin imagen",
   code: "abc123",
-  stock: 25,
+  stock: 5,
   status: "true",
   category: "mesas-de-comedor",
 });
@@ -148,8 +148,8 @@ router.get("/", async (req, res) => {
   res.status(200).json({ payload: result.slice(0, limit) });
 });
 
-router.get("/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
+router.get("/:pid", async (req, res) => {
+  const id = parseInt(req.params.pid);
   try {
     const result = await productManager.getProductById(id);
     res.status(200).json({ status: "success", payload: result });
@@ -179,9 +179,9 @@ router.post("/", (req, res) => {
   res.json(product);
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:pid", async (req, res) => {
   const productId = parseInt(req.params.id);
-  const updateFields = req.body;
+  const updateFields = await req.body;
   if (updateFields.hasOwnProperty("id")) {
     return res
       .status(400)
