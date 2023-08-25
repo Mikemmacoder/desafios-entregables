@@ -180,18 +180,29 @@ router.post("/", (req, res) => {
 });
 
 router.put("/:pid", async (req, res) => {
-  const productId = parseInt(req.params.id);
+  const productId = parseInt(req.params.pid);
   const updateFields = await req.body;
+
+  if (updateFields.price < 0 || updateFields.stock < 0) {
+    return res.status(400).json({
+      status: "error",
+      error: "Precio y stock no pueden ser números negativos.",
+    });
+  }
   if (updateFields.hasOwnProperty("id")) {
     return res
       .status(400)
       .json({ status: "error", error: "No puedes modificar el campo 'id'." });
   }
+  ///
   productManager.updateProductById(productId, updateFields);
-
+  const result = productManager.getProductById(productId);
+  if (typeof result === "string") {
+    return res.status(404).json({ status: "error", error: result });
+  }
   res.json({
     status: "success",
-    payload: "Producto actualizado correctamente.",
+    payload: result,
   });
 });
 

@@ -37,6 +37,10 @@ export class ProductManager {
     ) {
       return "Error: Todas las propiedades del producto son obligatorias.";
     }
+    if (price < 0 || stock < 0) {
+      return "Error: Precio y stock noo pueden ser números negativos.";
+    }
+
     let file = fs.readFileSync(this.path, "utf-8");
     let products = JSON.parse(file);
     let productIdCounter = products.length === 0 ? 1 : products.length + 1;
@@ -95,14 +99,14 @@ export class ProductManager {
     let productToUpdate = this.myArray.find((el) => el.id === id);
 
     if (!productToUpdate) {
-      console.log(`No se encontró ningún producto con el id ${id}`);
-      return;
+      return `No se encontró ningún producto con el id ${id}`;
     }
 
     Object.assign(productToUpdate, update);
 
     fs.writeFileSync(this.path, JSON.stringify(this.myArray));
-    console.log(`El producto con id ${id} ha sido actualizado correctamente.`);
+
+    return productToUpdate;
   }
 
   deleteProductById(id) {
