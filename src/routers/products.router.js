@@ -19,7 +19,7 @@ productManager.addProduct({
   title: "Mesa de comedor Wanama",
   description: "Mesa de comedor de madera rectangular",
   price: 95000,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc122",
   stock: 15,
   status: "true",
@@ -30,7 +30,7 @@ productManager.addProduct({
   title: "Mesa de comedor Diana",
   description: "Mesa de comedor de madera rectangular",
   price: 90000,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc123",
   stock: 5,
   status: "true",
@@ -41,7 +41,7 @@ productManager.addProduct({
   title: "Mesa de comedor Fiorella",
   description: "Mesa de comedor de madera rectangular",
   price: 80000,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc124",
   stock: 7,
   status: "true",
@@ -52,7 +52,7 @@ productManager.addProduct({
   title: "Mesa de centro Madison",
   description: "Mesa de centro de madera ovalada",
   price: 21500,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc125",
   stock: 6,
   status: "true",
@@ -63,7 +63,7 @@ productManager.addProduct({
   title: "Mesa de centro Sofía",
   description: "Mesa de centro de madera ovalada",
   price: 23700,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc126",
   stock: 13,
   status: "true",
@@ -74,7 +74,7 @@ productManager.addProduct({
   title: "Mesa de centro Italy",
   description: "Mesa de centro de madera ovalada",
   price: 19500,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc127",
   stock: 14,
   status: "true",
@@ -85,7 +85,7 @@ productManager.addProduct({
   title: "Silla Luis XIV",
   description: "Silla",
   price: 9500,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc128",
   stock: 17,
   status: "true",
@@ -96,7 +96,7 @@ productManager.addProduct({
   title: "Silla matera",
   description: "Silla",
   price: 7500,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc129",
   stock: 8,
   status: "true",
@@ -107,7 +107,7 @@ productManager.addProduct({
   title: "Silla Gervasoni",
   description: "Silla",
   price: 23500,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc130",
   stock: 2,
   status: "true",
@@ -118,7 +118,7 @@ productManager.addProduct({
   title: "Silla Jeanneret",
   description: "Silla",
   price: 20500,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc131",
   stock: 6,
   status: "true",
@@ -129,7 +129,7 @@ productManager.addProduct({
   title: "Silla Eames",
   description: "Silla",
   price: 5000,
-  thumbnail: "Sin imagen",
+  thumbnails: "Sin imagen",
   code: "abc132",
   stock: 12,
   status: "true",
@@ -150,14 +150,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:pid", async (req, res) => {
   const id = parseInt(req.params.pid);
-  try {
-    const result = await productManager.getProductById(id);
-    res.status(200).json({ status: "success", payload: result });
-  } catch (error) {
-    return res
-      .status(404)
-      .json({ status: "error", error: "Product does not exists" });
+
+  const result = await productManager.getProductById(id);
+  if (typeof result === "string") {
+    return res.status(404).json({ status: "error", error: result });
   }
+  return res.status(200).json({ status: "success", payload: result });
 });
 
 router.post("/", (req, res) => {

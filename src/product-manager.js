@@ -29,7 +29,7 @@ export class ProductManager {
       !title ||
       !description ||
       isNaN(price) ||
-      //  !thumbnail ||
+      !thumbnails ||
       !code ||
       isNaN(stock) ||
       !status ||
@@ -43,7 +43,8 @@ export class ProductManager {
 
     let file = fs.readFileSync(this.path, "utf-8");
     let products = JSON.parse(file);
-    let productIdCounter = products.length === 0 ? 1 : products.length + 1;
+    let productIdCounter =
+      products.length === 0 ? 1 : products[products.length - 1].id + 1;
 
     let newProduct = {
       id: productIdCounter,
