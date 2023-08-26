@@ -38,7 +38,7 @@ export class ProductManager {
       return "Error: Todas las propiedades del producto son obligatorias.";
     }
     if (price < 0 || stock < 0) {
-      return "Error: Precio y stock noo pueden ser números negativos.";
+      return "Error: Precio y stock no pueden ser números negativos.";
     }
 
     let file = fs.readFileSync(this.path, "utf-8");
@@ -59,9 +59,7 @@ export class ProductManager {
 
     const found = products.find((el) => el.code === newProduct.code);
     if (found) {
-      console.log(
-        "El código " + newProduct.code + " ya existe en ProductManager"
-      );
+      return "El código " + newProduct.code + " ya existe en ProductManager";
     } else {
       products.push(newProduct);
       fs.writeFileSync(this.path, JSON.stringify(products));

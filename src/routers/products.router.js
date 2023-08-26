@@ -175,8 +175,14 @@ router.post("/", (req, res) => {
       .status(400)
       .json({ status: "error", error: "Todos los campos requeridos" });
   }
-  productManager.addProduct(product);
-  res.json(product);
+  const productToAdd = productManager.addProduct(product);
+  if (typeof productToAdd === "string") {
+    return res.status(400).json({ status: "error", error: productToAdd });
+  }
+  res.json({
+    status: "success",
+    payload: productToAdd,
+  });
 });
 
 router.put("/:pid", async (req, res) => {
@@ -194,7 +200,6 @@ router.put("/:pid", async (req, res) => {
       .status(400)
       .json({ status: "error", error: "No puedes modificar el campo 'id'." });
   }
-  ///
   productManager.updateProductById(productId, updateFields);
   const result = productManager.getProductById(productId);
   if (typeof result === "string") {
