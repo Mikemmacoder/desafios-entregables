@@ -1,23 +1,31 @@
 <div>
-    <h1>RealTimePRoducts</h1>
-    <p>Registra un producto</p>
-    <form action="/api/products" method="post">
-      name: <input type="text" name="title" /><br />
-      description: <input type="text" name="description" /><br />
-      code: <input type="text" name="code" /><br />
-      price: <input type="number" name="price" min="0" required /><br />
-      status: <input type="checkbox" value="true" checked name="status" /><br />
-      stock: <input type="number" name="stock" min="0" required /><br />
-      category: <input type="text" name="category" /><br />
-      thumbnails: <input type="text" name="thumbnails[]" /><br />
+  <h1>RealTimePRoducts</h1>
+  <p>Registra un producto</p>
+  <form action="/api/products" method="post">
+    name:
+    <input type="text" name="title" id="title" /><br />
+    description:
+    <input type="text" name="description" id="description" /><br />
+    code:
+    <input type="text" name="code" id="code" /><br />
+    price:
+    <input type="number" name="price" min="0" required id="price" /><br />
+    status:
+    <input type="checkbox" value="true" checked name="status" /><br />
+    stock:
+    <input type="number" name="stock" min="0" required id="stock" /><br />
+    category:
+    <input type="text" name="category" id="category" /><br />
+    thumbnails:
+    <input type="text" name="thumbnails[]" /><br />
 
-      <input type="submit" value="Registrar producto" />
-    </form>
-    <hr>
-    <h2>
+    <input type="submit" value="Registrar producto" id="createBtn" />
+  </form>
+  <hr />
+  <h2>
     Products
   </h2>
-  <table>
+  <table id="realProductsTable">
     <thead>
       <tr>
         <td></td>
@@ -32,7 +40,9 @@
     <tbody>
       {{#each products}}
         <tr>
-            <td><button onclick="deleteProductById{{this.id}}">Eliminar</button></td>
+          <td><button
+              onclick="deleteProduct({{this.id}})"
+            >Eliminar</button></td>
           <td>{{this.title}}</td>
           <td>{{this.description}}</td>
           <td>{{this.price}}</td>
@@ -44,8 +54,5 @@
     </tbody>
   </table>
 </div>
-
-
-
-</div>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/index.js"></script>

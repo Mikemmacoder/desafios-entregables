@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 
 const app = express();
 app.use(express.json());
-/* app.use(express.urlencoded({ extended: true })); */
+app.use(express.urlencoded({ extended: true }));
 
 const httpServer = app.listen(8080, () => console.log("Server Up!"));
 const socketServer = new Server(httpServer);
@@ -20,7 +20,15 @@ app.use("/products", viewRouter);
 app.use("/api/products", productRouter);
 app.use("/api/carts", cartRouter);
 
-const messages = [];
+socketServer.on("connection", (socket) => {
+  console.log(`Nuevo cliente conectado: ${socket.id}`);
+  socket.on("productList", (data) => {
+    messages.push(data);
+    socketServer.emit("updatedProducts", data);
+  });
+});
+
+/* const messages = [];
 
 socketServer.on("connection", (socketClient) => {
   console.log(`Nuevo cliente conectado: ${socketClient.id}`);
@@ -28,4 +36,4 @@ socketServer.on("connection", (socketClient) => {
     messages.push(data);
     socketServer.emit("logs", messages);
   });
-});
+}); */

@@ -29,7 +29,7 @@ export class ProductManager {
       !title ||
       !description ||
       isNaN(price) ||
-      !thumbnails ||
+      /* !thumbnails || */
       !code ||
       isNaN(stock) ||
       !status ||
