@@ -23,7 +23,6 @@ app.use("/api/carts", cartRouter);
 socketServer.on("connection", (socket) => {
   console.log(`Nuevo cliente conectado: ${socket.id}`);
   socket.on("productList", (data) => {
-    messages.push(data);
     socketServer.emit("updatedProducts", data);
   });
 });

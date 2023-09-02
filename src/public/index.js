@@ -23,7 +23,7 @@ document.getElementById("createBtn").addEventListener("click", () => {
     .then((result) => result.json())
     .then((result) => {
       if (result.status === "error") throw new Error(result.error);
-      socketClient.emit("productList", result.payload);
+      socket.emit("productList", result.payload);
       alert("El producto se ha agregado con éxito");
       document.getElementById("title").value = "";
       document.getElementById("description").value = "";
@@ -61,14 +61,14 @@ socket.on("updatedProducts", (data) => {
     let tr = document.createElement("tr");
     tr.innerHTML = `
           <td><button
-              onclick="deleteProduct({{this.id}})"
+              onclick="deleteProduct(${product.id})"
             >Eliminar</button></td>
-          <td>{{this.title}}</td>
-          <td>{{this.description}}</td>
-          <td>{{this.price}}</td>
-          <td>{{this.stock}}</td>
-          <td>{{this.code}}</td>
-          <td>{{this.category}}</td>
+          <td>${product.title}</td>
+          <td>${product.description}</td>
+          <td>${product.price}</td>
+          <td>${product.stock}</td>
+          <td>${product.code}</td>
+          <td>${product.category}</td>
           `;
     table.getElementsByTagName("tbody")[0].appendChild(tr);
   }
