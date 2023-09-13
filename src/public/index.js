@@ -7,12 +7,14 @@ document.getElementById("createBtn").addEventListener("click", () => {
     price: document.getElementById("price").value,
     stock: document.getElementById("stock").value,
     category: document.getElementById("category").value,
+    status: document.getElementById("status").checked,
+    code: document.getElementById("code").value,
   };
   fetch("/api/products", {
     method: "post",
     body: JSON.stringify(body),
     headers: {
-      "Content-Type": "aplication/json",
+      "Content-Type": "application/json",
     },
   })
     .then((result) => result.json())
@@ -30,6 +32,7 @@ document.getElementById("createBtn").addEventListener("click", () => {
       document.getElementById("price").value = "";
       document.getElementById("stock").value = "";
       document.getElementById("category").value = "";
+      document.getElementById("code").value = "";
     })
     .catch((err) => alert(`Ocurrió un error: ${err}`));
 });
@@ -56,6 +59,7 @@ socket.on("updatedProducts", (data) => {
         <td>Stock</td>
         <td>Código</td>
         <td>Categoría</td>
+        <td>Status</td>
       </tr>`;
   for (product of data) {
     let tr = document.createElement("tr");
@@ -69,6 +73,7 @@ socket.on("updatedProducts", (data) => {
           <td>${product.stock}</td>
           <td>${product.code}</td>
           <td>${product.category}</td>
+          <td>${product.status}</td>
           `;
     table.getElementsByTagName("tbody")[0].appendChild(tr);
   }

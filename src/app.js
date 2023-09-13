@@ -11,7 +11,11 @@ app.use(express.urlencoded({ extended: true }));
 
 const httpServer = app.listen(8080, () => console.log("Server Up!"));
 const socketServer = new Server(httpServer);
-
+/* app.use((req, res, next) => {
+  console.log("Datos recibidos:", req.body);
+  next();
+});
+ */
 app.engine("handlebars", handlebars.engine());
 app.set("views", "./src/views");
 app.set("view engine", "handlebars");
@@ -20,6 +24,7 @@ app.use("/products", viewRouter);
 app.use("/api/products", productRouter);
 app.use("/api/carts", cartRouter);
 
+app.get("/", (req, res) => res.render("index"));
 socketServer.on("connection", (socket) => {
   console.log(`Nuevo cliente conectado: ${socket.id}`);
   socket.on("productList", (data) => {

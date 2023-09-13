@@ -1,7 +1,7 @@
 <div>
-  <h1>RealTimePRoducts</h1>
+  <h1>RealTimeProducts</h1>
   <p>Registra un producto</p>
-  <form action="/api/products" method="post">
+  <form>
     name:
     <input type="text" name="title" id="title" /><br />
     description:
@@ -11,13 +11,14 @@
     price:
     <input type="number" name="price" min="0" required id="price" /><br />
     status:
-    <input type="checkbox" value="true" checked name="status" /><br />
+    <input type="checkbox" value="true" checked name="status" id="status" /><br
+    />
     stock:
     <input type="number" name="stock" min="0" required id="stock" /><br />
     category:
     <input type="text" name="category" id="category" /><br />
     thumbnails:
-    <input type="text" name="thumbnails[]" /><br />
+    <input type="file" name="thumbnails[]" /><br />
 
     <input type="submit" value="Registrar producto" id="createBtn" />
   </form>
@@ -35,6 +36,7 @@
         <td>Stock</td>
         <td>Código</td>
         <td>Categoría</td>
+        <td>Status</td>
       </tr>
     </thead>
     <tbody>
@@ -49,6 +51,7 @@
           <td>{{this.stock}}</td>
           <td>{{this.code}}</td>
           <td>{{this.category}}</td>
+          <td>{{this.status}}</td>
         </tr>
       {{/each}}
     </tbody>

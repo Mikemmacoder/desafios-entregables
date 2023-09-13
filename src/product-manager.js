@@ -57,13 +57,15 @@ export class ProductManager {
       status: Boolean(status),
       category,
     };
-
-    const found = products.find((el) => el.code === newProduct.code);
-    if (found) {
+    console.log("Código del nuevo producto:", newProduct.code);
+    const exists = products.some((product) => product.code === newProduct.code);
+    console.log("exists" + exists);
+    if (exists) {
       return "El código " + newProduct.code + " ya existe en ProductManager";
     } else {
       products.push(newProduct);
       fs.writeFileSync(this.path, JSON.stringify(products));
+      console.log("se escribió");
       return newProduct;
     }
   }
@@ -114,8 +116,7 @@ export class ProductManager {
     this.myArray = JSON.parse(file);
     const productToDelete = this.myArray.find((el) => el.id === id);
     if (!productToDelete) {
-      console.log(`No se encontró ningún producto con el id ${id}`);
-      return;
+      return `No se encontró ningún producto con el id ${id}`;
     } else {
       const newArray = this.myArray.filter((el) => el.id !== id);
       this.myArray = newArray;
@@ -129,36 +130,3 @@ export class ProductManager {
     fs.writeFileSync(this.path, JSON.stringify(this.myArray));
   }
 }
-
-// ----- Instancio la clase -----
-/*let myProducts = new ProductManager("./ej-path.js");
-
-console.log(myProducts.getProducts());
-myProducts.addProduct({
-  title: "producto prueba",
-  description: "Este es un producto prueba",
-  price: 200,
-  thumbnail: "Sin imagen",
-  code: "abc123",
-  stock: 25,
-});
-myProducts.addProduct({
-  title: "producto2",
-  description: "Este es un producto2",
-  price: 500,
-  thumbnail: "Sin imagen",
-  code: "abc1241",
-  stock: 214,
-});
-console.log(myProducts.getProducts());
-
-console.log(myProducts.getProductById(1));
-console.log(myProducts.getProductById(2));
-
-myProducts.updateProductById(1, { price: 250 });
-myProducts.updateProductById(2, { price: 750 });
-console.log(myProducts.getProducts());
-
-myProducts.deleteProductById(1);
-console.log(myProducts.getProducts());
- */
