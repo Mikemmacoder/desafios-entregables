@@ -1,7 +1,7 @@
 import { Router } from "express";
 const router = Router();
 //import multer from "multer";
-import { ProductManager } from "../dao/fileSystem/product-manager.js";
+
 import productsModel from "../dao/models/products.model.js";
 import { PORT } from "../app.js";
 /* const storage = multer.diskStorage({
@@ -13,7 +13,6 @@ import { PORT } from "../app.js";
   },
 });
 const upload = multer({ storage }); */
-//const productManager = new ProductManager("./data/products.json");
 
 export const getProducts = async (req, res) => {
   try {
@@ -72,17 +71,6 @@ export const getProducts = async (req, res) => {
   }
 };
 
-/* router.get("/", async (req, res) => {
-  const result = await productManager.getProducts();
-  const limit = req.query.limit;
-  if (typeof result === "string") {
-    const error = result.split(" ");
-    return res
-      .status(parseInt(error[0].slice(1, 4)))
-      .json({ error: result.slice(6) });
-  }
-  res.status(200).json({ payload: result.slice(0, limit) });
-}); */
 router.get("/", async (req, res) => {
   const result = await getProducts(req, res);
   res.status(result.statusCode).json(result.response);
@@ -99,26 +87,8 @@ router.get("/:pid", async (req, res) => {
     res.status(500).json({ status: "error", error: err.message });
   }
 });
-/* router.get("/:pid", async (req, res) => {
-  const id = parseInt(req.params.pid);
-  const result = await productManager.getProductById(id);
-  if (typeof result === "string") {
-    return res.status(404).json({ status: "error", error: result });
-  }
-  return res.status(200).json({ status: "success", payload: result });
-}); */
 
 router.post("/", async (req, res) => {
-  /*const product = req.body;
-  const productToAdd = productManager.addProduct(product);
-  if (typeof productToAdd === "string") {
-    return res.status(400).json({ status: "error", error: productToAdd });
-  } else {
-    res.json({
-      status: "success",
-      payload: productToAdd,
-    });
-  } */
   try {
     const product = req.body;
     const result = await productsModel.create(product);
@@ -144,29 +114,6 @@ router.put("/:pid", async (req, res) => {
   } catch (err) {
     res.status(500).json({ status: "error", error: err.message });
   }
-  /* const productId = parseInt(req.params.pid);
-  const updateFields = await req.body;
-
-  if (updateFields.price < 0 || updateFields.stock < 0) {
-    return res.status(400).json({
-      status: "error",
-      error: "Precio y stock no pueden ser números negativos.",
-    });
-  }
-  if (updateFields.hasOwnProperty("id")) {
-    return res
-      .status(400)
-      .json({ status: "error", error: "No puedes modificar el campo 'id'." });
-  }
-  productManager.updateProductById(productId, updateFields);
-  const result = productManager.getProductById(productId);
-  if (typeof result === "string") {
-    return res.status(404).json({ status: "error", error: result });
-  }
-  res.json({
-    status: "success",
-    payload: result,
-  }); */
 });
 
 router.delete("/:pid", async (req, res) => {
@@ -181,13 +128,6 @@ router.delete("/:pid", async (req, res) => {
   } catch (err) {
     res.status(500).json({ status: "error", error: err.message });
   }
-  /* const productId = parseInt(req.params.pid);
-  productManager.deleteProductById(productId);
-  const result = await productManager.getProducts();
-  res.json({
-    status: "success",
-    payload: result,
-  }); */
 });
 
 export default router;

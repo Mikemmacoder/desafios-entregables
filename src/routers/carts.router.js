@@ -1,8 +1,5 @@
 import { Router } from "express";
 const router = Router();
-/* import { CartManager } from "../cart-manager.js";
-const cartManager = new CartManager("./data/carts.json");
-import fs from "fs"; */
 import cartsModel from "../dao/models/carts.model.js";
 import productsModel from "../dao/models/products.model.js";
 
@@ -32,8 +29,6 @@ export const getProductsFromCart = async (req, res) => {
 };
 
 router.post("/", async (req, res) => {
-  /* const newCart = cartManager.addCart();
-  return res.json(newCart); */
   try {
     const cartToAdd = await cartsModel.create({});
     res.status(201).json({ status: "success", payload: cartToAdd });
@@ -43,14 +38,6 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/:cid", async (req, res) => {
-  /* const id = parseInt(req.params.cid);
-  const result = await cartManager.getCartById(id);
-  if (typeof result === "string") {
-    return res
-      .status(404)
-      .json({ status: "error", error: "Cart does not exists" });
-  }
-  res.status(200).json({ status: "success", payload: result }); */
   const result = await getProductsFromCart(req, res);
   res.status(result.statusCode).json(result.response);
 });
@@ -86,27 +73,6 @@ router.post("/:cid/products/:pid", async (req, res) => {
   } catch (err) {
     res.status(500).json({ status: "error", error: err.message });
   }
-  /*   const cid = parseInt(req.params.cid);
-  const pid = parseInt(req.params.pid);
-  let fileProd = fs.readFileSync("./data/products.json", "utf-8");
-  let products = JSON.parse(fileProd);
-
-  const productExists = products.some((el) => el.id == pid);
-  if (!productExists) {
-    return res
-      .status(404)
-      .json({ status: "error", error: "Product does not exists" });
-  }
-  const updatedCart = cartManager.addProductsToCart(cid, pid);
-
-  if (typeof updatedCart === "string") {
-    return res.status(404).json({ status: "error", error: updatedCart });
-  }
-
-  return res.status(200).json({
-    status: "success",
-    message: `Product with id ${pid} added to cart with id ${cid}`,
-    updatedCart: updatedCart,*/
 });
 
 router.delete("/:cid/products/:pid", async (req, res) => {
