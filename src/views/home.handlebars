@@ -2,9 +2,24 @@
   <h1>
     Products
   </h1>
+  <hr />
+  <div>
+    {{#if paginateInfo.hasPrevPage}}
+      <a href="{{paginateInfo.prevLink}}">Anterior</a>
+    {{/if}}
+    {{#each paginateInfo.totalPages}}
+      <a href="{{this.link}}">{{this.page}}</a>
+    {{/each}}
+    {{#if paginateInfo.hasNextPage}}
+      <a href="{{paginateInfo.nextLink}}">Siguiente</a>
+    {{/if}}
+
+  </div>
+  <hr />
   <table>
     <thead>
       <tr>
+        <td></td>
         <td>Nombre</td>
         <td>Descripción</td>
         <td>Precio</td>
@@ -17,6 +32,9 @@
     <tbody>
       {{#each products}}
         <tr>
+          <td><button
+              onclick="addProductToCart('{{this._id}}')"
+            >AddToCart</button></td>
           <td>{{this.title}}</td>
           <td>{{this.description}}</td>
           <td>{{this.price}}</td>

@@ -1,9 +1,10 @@
 import { Router } from "express";
 const router = Router();
-import multer from "multer";
-import { ProductManager } from "../product-manager.js";
-
-const storage = multer.diskStorage({
+//import multer from "multer";
+import { ProductManager } from "../dao/fileSystem/product-manager.js";
+import productsModel from "../dao/models/products.model.js";
+import { PORT } from "../app.js";
+/* const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/");
   },
@@ -11,11 +12,67 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
-const upload = multer({ storage });
+const upload = multer({ storage }); */
+//const productManager = new ProductManager("./data/products.json");
 
-const productManager = new ProductManager("./data/products.json");
+export const getProducts = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const paginateOptions = { lean: true, limit, page };
 
-router.get("/", async (req, res) => {
+    const filterOptions = {};
+    if (req.query.stock) filterOptions.stock = req.query.stock;
+    if (req.query.category) filterOptions.category = req.query.category;
+    if (req.query.sort === "asc") paginateOptions.sort = { price: 1 };
+    if (req.query.sort === "desc") paginateOptions.sort = { price: -1 };
+    const result = await productsModel.paginate(filterOptions, paginateOptions);
+
+    let prevLink;
+    if (!req.query.page) {
+      prevLink = `http://${req.hostname}:${PORT}${req.originalUrl}&page=${result.prevPage}`;
+    } else {
+      const modifiedUrl = req.originalUrl.replace(
+        `page=${req.query.page}`,
+        `page=${result.prevPage}`
+      );
+      prevLink = `http://${req.hostname}:${PORT}${modifiedUrl}`;
+    }
+    let nextLink;
+    if (!req.query.page) {
+      nextLink = `http://${req.hostname}:${PORT}${req.originalUrl}&page=${result.nextPage}`;
+    } else {
+      const modifiedUrl = req.originalUrl.replace(
+        `page=${req.query.page}`,
+        `page=${result.nextPage}`
+      );
+      nextLink = `http://${req.hostname}:${PORT}${modifiedUrl}`;
+    }
+    return {
+      statusCode: 200,
+      response: {
+        status: "success",
+        payload: result.docs,
+        totalPages: result.totalPages,
+        prevPage: result.prevPage,
+        nextPage: result.nextPage,
+        page: result.page,
+        hasPrevPage: result.hasPrevPage,
+        hasNextPage: result.hasNextPage,
+        prevLink: result.hasPrevPage ? prevLink : null,
+        nextLink: result.hasNextPage ? nextLink : null,
+        totalPages0: result.totalPages == 0 && true,
+      },
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      response: { status: "error", error: err.message },
+    };
+  }
+};
+
+/* router.get("/", async (req, res) => {
   const result = await productManager.getProducts();
   const limit = req.query.limit;
   if (typeof result === "string") {
@@ -25,21 +82,34 @@ router.get("/", async (req, res) => {
       .json({ error: result.slice(6) });
   }
   res.status(200).json({ payload: result.slice(0, limit) });
+}); */
+router.get("/", async (req, res) => {
+  const result = await getProducts(req, res);
+  res.status(result.statusCode).json(result.response);
 });
-
 router.get("/:pid", async (req, res) => {
+  try {
+    const id = req.params.pid;
+    const result = await productsModel.findById(id).lean().exec();
+    if (result === null) {
+      return res.status(404).json({ status: "error", error: "Not found" });
+    }
+    res.status(200).json({ status: "success", payload: result });
+  } catch (err) {
+    res.status(500).json({ status: "error", error: err.message });
+  }
+});
+/* router.get("/:pid", async (req, res) => {
   const id = parseInt(req.params.pid);
-
   const result = await productManager.getProductById(id);
   if (typeof result === "string") {
     return res.status(404).json({ status: "error", error: result });
   }
   return res.status(200).json({ status: "success", payload: result });
-});
+}); */
 
 router.post("/", async (req, res) => {
-  const product = req.body;
-
+  /*const product = req.body;
   const productToAdd = productManager.addProduct(product);
   if (typeof productToAdd === "string") {
     return res.status(400).json({ status: "error", error: productToAdd });
@@ -48,11 +118,33 @@ router.post("/", async (req, res) => {
       status: "success",
       payload: productToAdd,
     });
+  } */
+  try {
+    const product = req.body;
+    const result = await productsModel.create(product);
+    const products = await productsModel.find().lean().exec();
+    res.status(201).json({ status: "success", payload: result });
+  } catch (err) {
+    res.status(500).json({ status: "error", error: err.message });
   }
 });
 
 router.put("/:pid", async (req, res) => {
-  const productId = parseInt(req.params.pid);
+  try {
+    const id = req.params.pid;
+    const data = req.body;
+    const result = await productsModel.findByIdAndUpdate(id, data, {
+      returnDocument: "after",
+    });
+    if (result === null) {
+      return res.status(404).json({ status: "error", error: "Not found" });
+    }
+    const products = await productsModel.find().lean().exec();
+    res.status(200).json({ status: "success", payload: result });
+  } catch (err) {
+    res.status(500).json({ status: "error", error: err.message });
+  }
+  /* const productId = parseInt(req.params.pid);
   const updateFields = await req.body;
 
   if (updateFields.price < 0 || updateFields.stock < 0) {
@@ -74,17 +166,28 @@ router.put("/:pid", async (req, res) => {
   res.json({
     status: "success",
     payload: result,
-  });
+  }); */
 });
 
-router.delete("/:id", async (req, res) => {
-  const productId = parseInt(req.params.id);
+router.delete("/:pid", async (req, res) => {
+  try {
+    const id = req.params.pid;
+    const result = await productsModel.findByIdAndDelete(id);
+    if (result === null) {
+      return res.status(404).json({ status: "error", error: "Not found" });
+    }
+    const products = await productsModel.find().lean().exec();
+    res.status(200).json({ status: "success", payload: products });
+  } catch (err) {
+    res.status(500).json({ status: "error", error: err.message });
+  }
+  /* const productId = parseInt(req.params.pid);
   productManager.deleteProductById(productId);
   const result = await productManager.getProducts();
   res.json({
     status: "success",
     payload: result,
-  });
+  }); */
 });
 
 export default router;
