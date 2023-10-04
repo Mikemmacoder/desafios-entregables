@@ -1,9 +1,13 @@
 import express from "express";
 import handlebars from "express-handlebars";
 import mongoose, { connect } from "mongoose";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import productRouter from "./routers/products.router.js";
 import cartRouter from "./routers/carts.router.js";
 import viewRouter from "./routers/view.router.js";
+import sessionViewRouter from "./routers/sessionViewRouter.js";
+import sessionRouter from "./routers/sessionRouter.js";
 import { Server } from "socket.io";
 
 const app = express();
@@ -20,6 +24,18 @@ const hbs = exphbs.create({
 });
 app.engine("handlebars", hbs.engine);
 
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl:
+        "mongodb+srv://micaelafcavallero:coder00@cluster0.czf9gom.mongodb.net/",
+      dbName: "ethereal",
+    }),
+    secret: "secret",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 app.set("views", "./src/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./src/public"));
@@ -39,9 +55,10 @@ try {
   const httpServer = app.listen(PORT, () => console.log("Server Up!"));
   const socketServer = new Server(httpServer);
 
-  app.get("/", (req, res) => res.render("index"));
+  app.use("/", sessionViewRouter);
   app.use("/api/products", productRouter);
   app.use("/api/carts", cartRouter);
+  app.use("/api/sessions", sessionRouter);
   app.use("/products", viewRouter);
   app.use("/carts", viewRouter);
   //app.use("/chat", chatRouter);
@@ -54,6 +71,7 @@ try {
   });
 } catch (err) {
   console.log(err.message);
+  process.exit(-1);
 }
 
 /* const messages = [];

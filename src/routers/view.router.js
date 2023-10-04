@@ -1,14 +1,12 @@
 import { Router } from "express";
-//import { ProductManager } from "../product-manager.js";
 import productsModel from "../dao/models/products.model.js";
 import { PORT } from "../app.js";
 import { getProductsFromCart } from "./carts.router.js";
 import { getProducts } from "./products.router.js";
+import { publicRoutes } from "../middlewares/auth.middleware.js";
 const router = Router();
-//const productManager = new ProductManager("./data/products.json");
 
-router.get("/", async (req, res) => {
-  /*const products = await productManager.getProducts();*/
+router.get("/", publicRoutes, async (req, res) => {
   const result = await getProducts(req, res);
   if (result.statusCode === 200) {
     const totalPages = [];
@@ -25,7 +23,9 @@ router.get("/", async (req, res) => {
       }
       totalPages.push({ page: index, link });
     }
+    const user = req.session.user;
     res.render("home", {
+      user,
       products: result.response.payload,
       paginateInfo: {
         hasPrevPage: result.response.hasPrevPage,
@@ -42,7 +42,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/realTimeProducts", async (req, res) => {
+router.get("/realTimeProducts", publicRoutes, async (req, res) => {
   //const products = await productManager.getProducts();
   const result = await getProducts(req, res);
   if (result.statusCode === 200) {
@@ -54,7 +54,7 @@ router.get("/realTimeProducts", async (req, res) => {
   }
 });
 
-router.get("/:cid", async (req, res) => {
+router.get("/:cid", publicRoutes, async (req, res) => {
   const result = await getProductsFromCart(req, res);
   if (result.statusCode === 200) {
     res.render("productsFromCart", {

@@ -2,6 +2,11 @@
   <h1>
     Products
   </h1>
+  <p>Bienvenido: {{user.first_name}}{{user.last_name}}</p><br />
+  <p><a href="/profile">{{user.email}}</a>
+    - role:{{user.role}}
+    - [
+    <a href="/api/sessions/logout">Logout</a>]</p>
   <hr />
   <div>
     {{#if paginateInfo.hasPrevPage}}
