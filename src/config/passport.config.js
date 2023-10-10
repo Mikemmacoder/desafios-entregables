@@ -26,6 +26,7 @@ const initializePassport = () => {
             email,
             age,
             password: createHash(password),
+            role: "user"
           };
           const result = await usersModel.create(newUser);
           return done(null, result);
@@ -42,13 +43,22 @@ const initializePassport = () => {
       {
         usernameField: "email",
       },
-      async (username, password, done) => {
+      async (username, password, done, email) => {
         try {
-          const user = await usersModel.findOne({ email: username });
-          if (!user) {
-            return done(null, false);
+          if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
+            const userAdmin = {
+              _id: "admin",
+              email: "adminCoder@coder.com",
+              password: "adminCod3r123",
+              role: "admin",
+              first_name: "Coder",
+              last_name: "House",
+              age: "25",
+            };
+            return done(null, userAdmin);
           }
-          if (!isValidPassword(user, password)) return done(null, false);
+          const user = await usersModel.findOne({ email: username });
+          if (!isValidPassword(user, password) || !user) return done(null, false);
           return done(null, user);
         } catch (err) {}
       }
@@ -56,12 +66,31 @@ const initializePassport = () => {
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user._id);
+    if (user.role === "admin"){
+      user = {_id: "admin"}
+      done(null, user._id);
+    } else{
+      done(null, user._id);
+      }
   });
 
   passport.deserializeUser(async (id, done) => {
-    const user = await usersModel.findById(id);
-    done(null, user);
+    if (id === "admin"){
+      const user = {
+        _id: "admin",
+        email: "adminCoder@coder.com",
+        password: "adminCod3r123",
+        role: "admin",
+        first_name: "Coder",
+        last_name: "House",
+        age: "25",
+      };
+      done(null, user); 
+    } else{
+      const user = await usersModel.findById(id);
+      done(null, user);
+    }
+    
   });
 };
 

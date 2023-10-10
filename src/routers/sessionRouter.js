@@ -35,13 +35,8 @@ router.post(
       last_name: req.user.last_name,
       email: req.user.email,
       age: req.user.age,
+      role: req.user.role
     };
-
-    if (req.session.user.email === "adminCoder@coder.com") {
-      req.session.user.role = "admin";
-    } else {
-      req.session.user.role = "user";
-    }
     res.redirect("/products");
   }
 );
