@@ -9,6 +9,8 @@ import viewRouter from "./routers/view.router.js";
 import sessionViewRouter from "./routers/sessionViewRouter.js";
 import sessionRouter from "./routers/sessionRouter.js";
 import { Server } from "socket.io";
+import passport from "passport";
+import initializePassport from "./config/passport.config.js";
 
 const app = express();
 app.use(express.json());
@@ -40,8 +42,11 @@ app.set("views", "./src/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./src/public"));
 export const PORT = 8080;
-//Mongoose
 
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
+//Mongoose
 try {
   await mongoose.connect(
     "mongodb+srv://micaelafcavallero:coder00@cluster0.czf9gom.mongodb.net",
@@ -56,9 +61,9 @@ try {
   const socketServer = new Server(httpServer);
 
   app.use("/", sessionViewRouter);
+  app.use("/api/sessions", sessionRouter);
   app.use("/api/products", productRouter);
   app.use("/api/carts", cartRouter);
-  app.use("/api/sessions", sessionRouter);
   app.use("/products", viewRouter);
   app.use("/carts", viewRouter);
   //app.use("/chat", chatRouter);

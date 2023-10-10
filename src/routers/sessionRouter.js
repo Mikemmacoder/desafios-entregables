@@ -1,31 +1,53 @@
 import { Router } from "express";
 import usersModel from "../dao/models/usersModel.js";
-
+import { isValidPassword } from "../utils.js";
+import passport from "passport";
 const router = Router();
 
-router.post("/register", async (req, res) => {
-  const userToRegister = req.body;
-  const user = new usersModel(userToRegister);
-  await user.save();
-  res.redirect("/");
-});
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await usersModel.findOne({ email, password }).lean().exec();
-  if (!user) {
-    return res.redirect("/");
+/* router.get("/register", (req, res) => {
+  res.render("/register");
+}); */
+router.post(
+  "/register",
+  passport.authenticate("register", {
+    // ese register es el nombre para identificar a cual de los middlewares de passport utilizar
+    failureRedirect: "/api/sessions/failRegister",
+  }),
+  async (req, res) => {
+    res.redirect("/"); //funciona- es la ruta del home
   }
-  if (
-    user.email === "adminCoder@coder.com" &&
-    user.password === "adminCod3r123"
-  ) {
-    user.role = "admin";
-  } else {
-    user.role = "user";
+);
+
+router.get("/failRegister", (req, res) =>
+  res.send({ error: "Passport register failed" })
+);
+router.post(
+  "/login",
+  passport.authenticate("login", { failureRedirect: "/session/failLogin" }),
+  async (req, res) => {
+    if (!req.user) {
+      return res
+        .status(400)
+        .send({ status: "error", error: "Invalid credentials" });
+    }
+    req.session.user = {
+      first_name: req.user.first_name,
+      last_name: req.user.last_name,
+      email: req.user.email,
+      age: req.user.age,
+    };
+
+    if (req.session.user.email === "adminCoder@coder.com") {
+      req.session.user.role = "admin";
+    } else {
+      req.session.user.role = "user";
+    }
+    res.redirect("/products");
   }
-  req.session.user = user;
-  res.redirect("/products");
-});
+);
+router.get("/failLogin", (req, res) =>
+  res.send({ error: "Passport login failed" })
+);
 
 router.get("/logout", (req, res) => {
   req.session.destroy((err) => {
