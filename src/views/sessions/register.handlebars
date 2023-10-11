@@ -1,3 +1,7 @@
+{{#if registerFailure}}
+        <p>Algo salió mal! El usuario ya se encuentra registrado.</p>
+    {{/if}}
+
 <h1>Registrar usuarios</h1>
 
 <form action="/api/sessions/register" method="post">

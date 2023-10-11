@@ -1,3 +1,11 @@
+{{#if registerSuccess}}
+        <p>¡Tu registro fue exitoso!</p>
+    {{/if}}
+  {{#if error}}
+        <p>Error: Credenciales inválidas</p>
+    {{/if}}
+
+
 <h1>Iniciar sesión</h1>
 
 <form action="/api/sessions/login" method="post">

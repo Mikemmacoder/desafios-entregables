@@ -43,7 +43,7 @@ const initializePassport = () => {
       {
         usernameField: "email",
       },
-      async (username, password, done, email) => {
+      async (username, password, done) => {
         try {
           if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
             const userAdmin = {

@@ -11,19 +11,18 @@ router.post(
   "/register",
   passport.authenticate("register", {
     // ese register es el nombre para identificar a cual de los middlewares de passport utilizar
-    failureRedirect: "/api/sessions/failRegister",
+    failureRedirect: "/register?registerFailure=true",
   }),
   async (req, res) => {
-    res.redirect("/"); //funciona- es la ruta del home
+    
+    res.redirect("/?registerSuccess=true");
   }
 );
 
-router.get("/failRegister", (req, res) =>
-  res.send({ error: "Passport register failed" })
-);
+
 router.post(
   "/login",
-  passport.authenticate("login", { failureRedirect: "/session/failLogin" }),
+  passport.authenticate("login", { failureRedirect: "/?error=true" }),
   async (req, res) => {
     if (!req.user) {
       return res

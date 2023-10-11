@@ -4,11 +4,14 @@ import { privateRoutes, publicRoutes } from "../middlewares/auth.middleware.js";
 const router = Router();
 
 router.get("/register", privateRoutes, async (req, res) => {
-  res.render("sessions/register"); //referencia a la carpeta sessions y a la vista register
+  const registerFailure = req.query.registerFailure === 'true'
+  res.render("sessions/register", {registerFailure}); //referencia a la carpeta sessions y a la vista register
 });
 
 router.get("/", privateRoutes, (req, res) => {
-  res.render("sessions/login"); //referencia a la carpeta sessions y a la vista login
+  const registerSuccess = req.query.registerSuccess === 'true'
+  const error = req.query.error === 'true'
+  res.render("sessions/login", {registerSuccess, error}); //referencia a la carpeta sessions y a la vista login
 });
 
 router.get("/profile", publicRoutes, (req, res) => {
