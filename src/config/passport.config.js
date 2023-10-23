@@ -3,6 +3,7 @@ import local from "passport-local";
 import GitHubStrategy from "passport-github2"
 import { createHash, isValidPassword } from "../utils.js";
 import usersModel from "../dao/models/usersModel.js";
+import cartsModel from "../dao/models/carts.model.js";
 
 const localStrategy = local.Strategy;
 
@@ -21,13 +22,16 @@ const initializePassport = () => {
           if (user) {
             return done(null, false);
           }
+          const cartForNewUser = await cartsModel.create({})
+          console.log(cartForNewUser)
           const newUser = {
             first_name,
             last_name,
             email,
             age,
             password: createHash(password),
-            role: "user"
+            role: "user",
+            cart: cartForNewUser
           };
           const result = await usersModel.create(newUser);
           return done(null, result);

@@ -7,7 +7,7 @@ const usersSchema = new mongoose.Schema({
   age: { type: Number},
   password: { type: String },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  cart: {type: [{_id: false, cart:{type: mongoose.Schema.Types.ObjectId, ref: 'carts'}}], default: []}
+  cart: {type: mongoose.Schema.Types.ObjectId, ref: 'carts'}
 });
 const usersCollection = "users";
 const usersModel = mongoose.model(usersCollection, usersSchema);

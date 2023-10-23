@@ -11,3 +11,9 @@ export const createHash = (password) =>
 
 export const isValidPassword = (user, password) =>
   bcrypt.compareSync(password, user.password);
+
+import handlebars from 'handlebars';
+export const hbarsHelp = handlebars.registerHelper('json', function(context) {
+  return JSON.stringify(context);
+});
+

@@ -47,6 +47,12 @@ export const getProducts = async (req, res) => {
       );
       nextLink = `http://${req.hostname}:${PORT}${modifiedUrl}`;
     }
+    if (page > result.totalPages) {
+      return {
+        statusCode: 404,
+        response: { status: "error", error: "not found" },
+      }
+    }
     return {
       statusCode: 200,
       response: {

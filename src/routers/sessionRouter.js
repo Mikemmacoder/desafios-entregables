@@ -1,5 +1,6 @@
 import { Router } from "express";
 import usersModel from "../dao/models/usersModel.js";
+import cartsModel from "../dao/models/carts.model.js";
 import { isValidPassword } from "../utils.js";
 import passport from "passport";
 const router = Router();
@@ -29,14 +30,24 @@ router.post(
         .status(400)
         .send({ status: "error", error: "Invalid credentials" });
     }
-    req.session.user = {
-      first_name: req.user.first_name,
-      last_name: req.user.last_name,
-      email: req.user.email,
-      age: req.user.age,
-      role: req.user.role
-    };
-    res.redirect("/products");
+    try {
+      
+      const userMongoose = await usersModel.findOne({ email: req.user.email }).populate('cart');
+
+      req.session.user = {
+        first_name: req.user.first_name,
+        last_name: req.user.last_name,
+        email: req.user.email,
+        age: req.user.age,
+        role: req.user.role,
+        cart: userMongoose.cart
+      };
+
+      res.redirect("/products");
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({ status: "error", error: "Server Error" });
+    }
   }
 );
 router.get("/failLogin", (req, res) =>

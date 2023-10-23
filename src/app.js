@@ -24,6 +24,7 @@ const hbs = exphbs.create({
     },
   },
 });
+
 app.engine("handlebars", hbs.engine);
 
 app.use(

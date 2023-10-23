@@ -1,8 +1,10 @@
+
 <div>
+
   <h1>
     Products
   </h1>
-  <p>Bienvenido: {{user.first_name}}{{user.last_name}}</p><br />
+  <p>Bienvenido: {{user.first_name}} {{user.last_name}}</p><br />
   <p><a href="/profile">{{user.email}}</a>
     - role:{{user.role}}
     - [
@@ -20,6 +22,7 @@
     {{/if}}
 
   </div>
+
   <hr />
   <table>
     <thead>
@@ -54,20 +57,11 @@
 </div>
 
 <script>
-  const addProductToCart = (pid) => { 
-    fetch(`/api/carts`, { 
-      method: 'post' 
-      })
-        .then(result => result.json()) 
-        .then(result => {
-          if (result.status ==='error') throw new Error(result.error) 
-          return result.payload._id 
-          }) 
-        .then(cid => 
+  const addProductToCart = ( pid) => { 
+          const cid = {{{json user.cart._id}}};
           fetch(`/api/carts/${cid}/products/${pid}`, { 
             method: 'post' 
             }) 
-          )
         .then(result => result.json()) 
         .then(result => { 
           if (result.status ==='error') throw new Error(result.error) 
