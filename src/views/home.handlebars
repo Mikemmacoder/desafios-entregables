@@ -1,5 +1,15 @@
-
-<div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+  {{#if showErrorAlert}}
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops algo salió mal',
+      text: {{{json errorMessage}}},
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'OK'
+    })
+  {{/if}}
+</script>
 
   <h1>
     Products
@@ -58,7 +68,7 @@
 
 <script>
   const addProductToCart = ( pid) => { 
-          const cid = {{{json user.cart._id}}};
+          const cid = {{{json user.cart._id}}}
           fetch(`/api/carts/${cid}/products/${pid}`, { 
             method: 'post' 
             }) 

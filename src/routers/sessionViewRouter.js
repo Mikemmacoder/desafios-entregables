@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { privateRoutes, publicRoutes } from "../middlewares/auth.middleware.js";
-
 const router = Router();
 
 router.get("/register", privateRoutes, async (req, res) => {

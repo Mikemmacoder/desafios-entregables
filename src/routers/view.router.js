@@ -36,9 +36,13 @@ router.get("/", publicRoutes, async (req, res) => {
       },
     });
   } else {
+    const showErrorAlert = true; 
+    const errorMessage = result.response.error 
     res
       .status(result.statusCode)
-      .json({ status: "error", error: result.response.error });
+      .render("home", { showErrorAlert, errorMessage })
+      //renderiza sweet alert
+      //TODO: ahora el home renderiza productos, debería haber una pagina de bienvenida a la cual redireccionar
   }
 });
 
@@ -48,9 +52,13 @@ router.get("/realTimeProducts", publicRoutes, async (req, res) => {
   if (result.statusCode === 200) {
     res.render("realTimeProducts", { products: result.response.payload });
   } else {
+    const showErrorAlert = true; 
+    const errorMessage = result.response.error 
     res
       .status(result.statusCode)
-      .json({ status: "error", error: result.response.error });
+      .render("home", { showErrorAlert, errorMessage })
+      //renderiza sweet alert
+      //TODO: ahora el home renderiza productos, debería haber una pagina de bienvenida a la cual redireccionar
   }
 });
 
@@ -61,9 +69,12 @@ router.get("/:cid", publicRoutes, async (req, res) => {
       cart: result.response.payload,
     });
   } else {
-    res
-      .status(result.statusCode)
-      .json({ status: "error", error: result.response.error });
+    const showErrorAlert = true; 
+    const errorMessage = result.response.error 
+    res.status(result.statusCode)
+    .render("home", { showErrorAlert, errorMessage })
+      //renderiza sweet alert
+      //TODO: ahora el home renderiza productos, debería haber una pagina de bienvenida a la cual redireccionar
   }
 });
 
