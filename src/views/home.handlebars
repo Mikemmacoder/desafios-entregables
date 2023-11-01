@@ -68,7 +68,7 @@
 
 <script>
   const addProductToCart = ( pid) => { 
-          const cid = {{{json user.cart._id}}}
+          const cid = {{{json user.cart}}}
           fetch(`/api/carts/${cid}/products/${pid}`, { 
             method: 'post' 
             }) 

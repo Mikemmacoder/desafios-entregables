@@ -51,6 +51,7 @@ const initializePassport = () => {
       async (username, password, done) => {
         try {
           if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
+            const cartForAdmin = await cartsModel.findOne({ _id: '6536fce65e2cb6f12d2819f2'});
             const userAdmin = {
               _id: "admin",
               email: "adminCoder@coder.com",
@@ -59,6 +60,7 @@ const initializePassport = () => {
               first_name: "Coder",
               last_name: "House",
               age: "25",
+              cart: cartForAdmin._id,
             };
             return done(null, userAdmin);
           }
@@ -102,6 +104,7 @@ const initializePassport = () => {
 
   passport.deserializeUser(async (id, done) => {
     if (id === "admin"){
+      const cartForAdmin = await cartsModel.findById('6536fce65e2cb6f12d2819f2');
       const user = {
         _id: "admin",
         email: "adminCoder@coder.com",
@@ -110,6 +113,7 @@ const initializePassport = () => {
         first_name: "Coder",
         last_name: "House",
         age: "25",
+        cart: cartForAdmin,
       };
       done(null, user); 
     } else{

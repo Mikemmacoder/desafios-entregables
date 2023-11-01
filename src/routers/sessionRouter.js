@@ -32,7 +32,7 @@ router.post(
     }
     try {
       
-      const userMongoose = await usersModel.findOne({ email: req.user.email }).populate('cart');
+      const userMongoose = await usersModel.findOne({ email: req.user.email })
 
       req.session.user = {
         first_name: req.user.first_name,
@@ -40,7 +40,7 @@ router.post(
         email: req.user.email,
         age: req.user.age,
         role: req.user.role,
-        cart: userMongoose.cart
+        cart: req.user.cart
       };
 
       res.redirect("/products");
