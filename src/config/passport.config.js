@@ -1,11 +1,13 @@
 import passport from "passport";
 import local from "passport-local";
 import GitHubStrategy from "passport-github2"
-import { createHash, isValidPassword } from "../utils.js";
+import { createHash, isValidPassword, JWT_PRIVATE_KEY, extractCookie, generateToken } from "../utils.js";
 import usersModel from "../dao/models/usersModel.js";
 import cartsModel from "../dao/models/carts.model.js";
+import passport_jwt from 'passport-jwt';
 
 const localStrategy = local.Strategy;
+const JWTStrategy = passport_jwt.Strategy
 
 const initializePassport = () => {
   passport.use(
@@ -52,7 +54,7 @@ const initializePassport = () => {
         try {
           if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
             const cartForAdmin = await cartsModel.findOne({ _id: '6536fce65e2cb6f12d2819f2'});
-            const userAdmin = {
+            const user = {
               _id: "admin",
               email: "adminCoder@coder.com",
               password: "adminCod3r123",
@@ -62,10 +64,16 @@ const initializePassport = () => {
               age: "25",
               cart: cartForAdmin._id,
             };
-            return done(null, userAdmin);
+            const tokenAdmin = generateToken(user)
+            user.token = tokenAdmin
+            return done(null, user);
           }
           const user = await usersModel.findOne({ email: username });
           if (!isValidPassword(user, password) || !user) return done(null, false);
+          
+          const token = generateToken(user)
+          user.token = token
+
           return done(null, user);
         } catch (err) {}
       }
@@ -91,6 +99,13 @@ const initializePassport = () => {
       console.error(err)
         return done('Error to login with github')
     }
+}))
+
+passport.use('jwt', new JWTStrategy({
+  jwtFromRequest: passport_jwt.ExtractJwt.fromExtractors([extractCookie]),
+  secretOrKey: JWT_PRIVATE_KEY
+}, async(jwt_payload, done) => {
+  done(null, jwt_payload)
 }))
 
   passport.serializeUser((user, done) => {

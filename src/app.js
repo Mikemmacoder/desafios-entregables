@@ -11,9 +11,13 @@ import sessionRouter from "./routers/sessionRouter.js";
 import { Server } from "socket.io";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
+import { passportCall } from "./utils.js";
+import cookieParser from "cookie-parser";
+import { handlePolicies } from "./middlewares/handlePolicies.js";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
 
 import exphbs from "express-handlebars";
@@ -29,11 +33,6 @@ app.engine("handlebars", hbs.engine);
 
 app.use(
   session({
-    store: MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://micaelafcavallero:coder00@cluster0.czf9gom.mongodb.net/",
-      dbName: "ethereal",
-    }),
     secret: "secret",
     resave: true,
     saveUninitialized: true,
@@ -56,16 +55,15 @@ try {
     }
   );
   console.log("DB conected");
-  //await productsDAO.insertMany(products);
 
   const httpServer = app.listen(PORT, () => console.log("Server Up!"));
   const socketServer = new Server(httpServer);
-
+  
   app.use("/", sessionViewRouter);
   app.use("/api/sessions", sessionRouter);
   app.use("/api/products", productRouter);
   app.use("/api/carts", cartRouter);
-  app.use("/products", viewRouter);
+  app.use("/products", passportCall('jwt'), handlePolicies(['ADMIN', 'USER']), viewRouter);
   app.use("/carts", viewRouter);
   //app.use("/chat", chatRouter);
 

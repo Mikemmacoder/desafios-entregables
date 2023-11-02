@@ -1,8 +1,10 @@
 import { Router } from "express";
 import usersModel from "../dao/models/usersModel.js";
 import cartsModel from "../dao/models/carts.model.js";
-import { isValidPassword } from "../utils.js";
+import { JWT_COOKIE_NAME, isValidPassword } from "../utils.js";
 import passport from "passport";
+
+
 const router = Router();
 
 /* router.get("/register", (req, res) => {
@@ -30,24 +32,8 @@ router.post(
         .status(400)
         .send({ status: "error", error: "Invalid credentials" });
     }
-    try {
-      
-      const userMongoose = await usersModel.findOne({ email: req.user.email })
+      res.cookie(JWT_COOKIE_NAME, req.user.token).redirect("/products");
 
-      req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        email: req.user.email,
-        age: req.user.age,
-        role: req.user.role,
-        cart: req.user.cart
-      };
-
-      res.redirect("/products");
-    } catch (error) {
-      console.error(error);
-      return res.status(500).send({ status: "error", error: "Server Error" });
-    }
   }
 );
 router.get("/failLogin", (req, res) =>
@@ -55,12 +41,12 @@ router.get("/failLogin", (req, res) =>
 );
 
 router.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
+   req.session.destroy((err) => { // mantengo el req.destroy porque sino no me desloguea
     if (err) {
       console.log(err);
       res.status(500).render("errors/base", { error: err });
-    } else res.redirect("/");
-  });
+    } else res.clearCookie(JWT_COOKIE_NAME).redirect('/')
+  }) 
 });
 
 router.get('/github', passport.authenticate('github', { scope: ['user:email']}), (req, res) => {

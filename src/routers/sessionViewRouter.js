@@ -14,7 +14,7 @@ router.get("/", privateRoutes, (req, res) => {
 });
 
 router.get("/profile", publicRoutes, (req, res) => {
-  res.render("sessions/profile", req.session.user); //referencia a la carpeta sessions y a la vista profile
+  res.render("sessions/profile", req.user); //referencia a la carpeta sessions y a la vista profile
 });
 
 export default router;

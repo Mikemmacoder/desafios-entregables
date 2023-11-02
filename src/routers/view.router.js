@@ -23,7 +23,7 @@ router.get("/", publicRoutes, async (req, res) => {
       }
       totalPages.push({ page: index, link });
     }
-    const user = req.session.user;
+    const user = req.user.user;
     res.render("home", {
       user,
       products: result.response.payload,
