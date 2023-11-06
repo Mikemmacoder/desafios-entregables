@@ -5,6 +5,7 @@ import { createHash, isValidPassword, JWT_PRIVATE_KEY, extractCookie, generateTo
 import usersModel from "../dao/models/usersModel.js";
 import cartsModel from "../dao/models/carts.model.js";
 import passport_jwt from 'passport-jwt';
+import config from "./config.js";
 
 const localStrategy = local.Strategy;
 const JWTStrategy = passport_jwt.Strategy
@@ -52,12 +53,12 @@ const initializePassport = () => {
       },
       async (username, password, done) => {
         try {
-          if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
+          if (username === config.admin.email && password === config.admin.password) {
             const cartForAdmin = await cartsModel.findOne({ _id: '6536fce65e2cb6f12d2819f2'});
             const user = {
               _id: "admin",
-              email: "adminCoder@coder.com",
-              password: "adminCod3r123",
+              email: config.admin.email,
+              password: config.admin.password,
               role: "admin",
               first_name: "Coder",
               last_name: "House",
@@ -122,8 +123,8 @@ passport.use('jwt', new JWTStrategy({
       const cartForAdmin = await cartsModel.findById('6536fce65e2cb6f12d2819f2');
       const user = {
         _id: "admin",
-        email: "adminCoder@coder.com",
-        password: "adminCod3r123",
+        email: config.admin.email,
+        password: config.admin.password,
         role: "admin",
         first_name: "Coder",
         last_name: "House",

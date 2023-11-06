@@ -14,6 +14,7 @@ import initializePassport from "./config/passport.config.js";
 import { passportCall } from "./utils.js";
 import cookieParser from "cookie-parser";
 import { handlePolicies } from "./middlewares/handlePolicies.js";
+import config from "./config/config.js";
 
 const app = express();
 app.use(express.json());
@@ -41,7 +42,7 @@ app.use(
 app.set("views", "./src/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./src/public"));
-export const PORT = 8080;
+export const PORT = config.apiserver.port;
 
 initializePassport();
 app.use(passport.initialize());
@@ -49,9 +50,9 @@ app.use(passport.session());
 //Mongoose
 try {
   await mongoose.connect(
-    "mongodb+srv://micaelafcavallero:coder00@cluster0.czf9gom.mongodb.net",
+    config.mongo.uri,
     {
-      dbName: "ethereal",
+      dbName: config.mongo.dbname,
     }
   );
   console.log("DB conected");

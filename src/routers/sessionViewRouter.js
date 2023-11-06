@@ -1,20 +1,10 @@
 import { Router } from "express";
 import { privateRoutes, publicRoutes } from "../middlewares/auth.middleware.js";
 const router = Router();
+import { getRegisterController, getLoginController, getProfileController } from "../controllers/sessions.controllers.js";
 
-router.get("/register", privateRoutes, async (req, res) => {
-  const registerFailure = req.query.registerFailure === 'true'
-  res.render("sessions/register", {registerFailure}); //referencia a la carpeta sessions y a la vista register
-});
-
-router.get("/", privateRoutes, (req, res) => {
-  const registerSuccess = req.query.registerSuccess === 'true'
-  const error = req.query.error === 'true'
-  res.render("sessions/login", {registerSuccess, error}); //referencia a la carpeta sessions y a la vista login
-});
-
-router.get("/profile", publicRoutes, (req, res) => {
-  res.render("sessions/profile", req.user); //referencia a la carpeta sessions y a la vista profile
-});
+router.get("/register", privateRoutes, getRegisterController);
+router.get("/", privateRoutes, getLoginController);
+router.get("/profile", publicRoutes, getProfileController);
 
 export default router;
