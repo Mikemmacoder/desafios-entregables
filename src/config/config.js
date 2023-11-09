@@ -12,5 +12,14 @@ export default {
     admin: {
         email: process.env.ADMIN_EMAIL,
         password: process.env.ADMIN_PASS
+    },
+    jwt: {
+        privateKey: process.env.JWT_PRIVATE_KEY,
+        cookieName: process.env.JWT_COOKIE_NAME 
+    },
+    github: {
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: process.env.GITHUB_CALLBACK_URL 
     }
 }
