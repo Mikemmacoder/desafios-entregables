@@ -11,7 +11,7 @@ import sessionRouter from "./routers/sessionRouter.js";
 import { Server } from "socket.io";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
-import { passportCall } from "./utils.js";
+import { passportCall } from "./utils/utils.js";
 import cookieParser from "cookie-parser";
 import { handlePolicies } from "./middlewares/handlePolicies.js";
 import config from "./config/config.js";

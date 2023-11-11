@@ -1,7 +1,8 @@
-import { JWT_COOKIE_NAME } from "../utils.js";
+import { JWT_COOKIE_NAME, generateToken } from "../utils/utils.js";
 
 //-----controllers de api/sessions----- en session.router
-export const registerController =async (req, res) => {
+export const registerController =(req, res) => {
+    console.log('registerController: redirect /')
     res.redirect("/?registerSuccess=true");
 }
 export const loginController =async (req, res) => {
@@ -24,10 +25,15 @@ export const logoutController =async (req, res) => {
     }) 
 } 
 export const githubLoginController =async (req, res) => {
+  
 } 
 export const githubCallbackController =async (req, res) => {
-    req.session.user = req.user
-    res.redirect('/products')
+    const user = req.user
+    req.session.user = user
+    res.cookie(JWT_COOKIE_NAME, req.user.token).redirect("/products")
+    //grabo el user con token (generado en el passport.config) en una cookie, 
+    //porque al autenticar con jwt y github, si no lo tiene, me dice no tengo token y no puedo ingresar a la vista /products
+    
 } 
 
 

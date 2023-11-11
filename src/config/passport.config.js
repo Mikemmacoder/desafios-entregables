@@ -37,7 +37,7 @@ const initializePassport = () => {
             cart: cartForNewUser
           };
           const result = await usersModel.create(newUser);
-          return done(null, result);
+          return done(null, result );
         } catch (err) {
           return done(err);
         }
@@ -80,6 +80,8 @@ const initializePassport = () => {
       }
     )
   );
+
+ 
   passport.use('github', new GitHubStrategy({
     clientID: config.github.clientID,
     clientSecret: config.github.clientSecret,
@@ -88,13 +90,21 @@ const initializePassport = () => {
     console.log(profile)
     try {
         const user = await usersModel.findOne({ email: profile._json.email })
-        if (user) return done(null, user)
+        if (user){
+          const token = generateToken(user)
+          user.token = token
+          return done(null, user)
+        }
+         
         const newUser = await usersModel.create({
             first_name: profile._json.name,
             last_name: '',
             email: profile._json.email,
-            password: ''
+            password: '', 
+            // role: 'user' 
         })
+        const token = generateToken(newUser)
+        newUser.token = token
         return done(null, newUser)
     } catch(err) {
       console.error(err)
