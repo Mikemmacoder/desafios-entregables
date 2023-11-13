@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import { getProductsController, getProductByIdController, createProductController, modifyProductByIdController, deleteProductByIdController } from "../controllers/products.controllers.js";
+import { getProductsController, getProductController, createProductController, modifyProductByIdController, deleteProductByIdController } from "../controllers/products.controllers.js";
 //import multer from "multer";
 
 /* const storage = multer.diskStorage({
@@ -14,7 +14,7 @@ import { getProductsController, getProductByIdController, createProductControlle
 const upload = multer({ storage }); */
 
 router.get("/", getProductsController);
-router.get("/:pid", getProductByIdController);
+router.get("/:pid", getProductController);
 router.post("/", createProductController);
 router.put("/:pid", modifyProductByIdController);
 router.delete("/:pid", deleteProductByIdController);

@@ -2,8 +2,8 @@ import passport from "passport";
 import local from "passport-local";
 import GitHubStrategy from "passport-github2"
 import { createHash, isValidPassword, JWT_PRIVATE_KEY, extractCookie, generateToken } from "../utils/utils.js";
-import usersModel from "../dao/models/usersModel.js";
-import cartsModel from "../dao/models/carts.model.js";
+import usersModel from "../dao/mongoDao/models/usersModel.js";
+import cartsModel from "../dao/mongoDao/models/carts.model.js";
 import passport_jwt from 'passport-jwt';
 import config from "./config.js";
 

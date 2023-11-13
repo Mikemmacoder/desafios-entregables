@@ -1,7 +1,27 @@
-/* import productsModel from "../dao/models/products.model.js";
-import { PORT } from "../app.js";
+import productsModel from "./models/products.model.js";
+import { PORT } from "../../app.js";
 
-export const getProducts = async (req, res) => {
+export const getAllProducts = async () => {
+    const products = await productsModel.find().lean().exec();
+    return products
+};
+export const getProduct = async (id) => {
+    const result = await productsModel.findById(id).lean().exec();
+    return result
+}
+export const create = async (product) => {
+    const result = await productsModel.create(product)
+    return result
+};
+export const update = async (id, data) => {
+    const result = await productsModel.findByIdAndUpdate(id, data)
+    return result
+};
+export const deleteById = async (id) => {
+    const result = await productsModel.findByIdAndDelete(id);
+    return result
+};
+export const getAllPaginate = async (req) => {
     try {
       const limit = parseInt(req.query.limit) || 10;
       const page = parseInt(req.query.page) || 1;
@@ -62,13 +82,4 @@ export const getProducts = async (req, res) => {
         response: { status: "error", error: err.message },
       };
     }
-  };
-
-export const getProductsService = async () => {
-    const result = await getProducts();
-    return result
 }
-export const getProductByIdService = async (id) => {
-    const result = await productsModel.findById(id).lean().exec();
-    return result
-} */

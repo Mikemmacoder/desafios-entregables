@@ -1,14 +1,11 @@
-import cartsModel from "../dao/models/carts.model.js";
-import productsModel from "../dao/models/products.model.js";
+import { getCart, createCart, getProductsFromCart, updateCart} from "../dao/mongoDao/cartsDao.js";
+import { getProduct} from "../dao/mongoDao/productsDao.js";
 
 //-----controllers de api/carts-----
-export const getProductsFromCart = async (req, res) => {
+/* export const getProductsFromCart = async (req, res) => {
     try {
       const id = req.params.cid;
-      const result = await cartsModel
-        .findById(id)
-        .populate("products.product")
-        .lean();
+      const result = await getProducts(id)
       if (result === null) {
         return {
           statusCode: 404,
@@ -25,30 +22,38 @@ export const getProductsFromCart = async (req, res) => {
         response: { status: "error", error: err.message },
       };
     }
-  };
+  }; */
 export const createCartController = async (req, res) => {
     try {
-        const cartToAdd = await cartsModel.create({});
+        const cartToAdd = await createCart();
         res.status(201).json({ status: "success", payload: cartToAdd });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
       }
 }
-export const getCartByIdController = async (req, res) => {
-    const result = await getProductsFromCart(req, res);
-  res.status(result.statusCode).json(result.response);
-}
+export const getCartController = async (req, res) => {
+  try {
+    const id = req.params.cid;
+    const result = await getProductsFromCart(id)
+    if (result === null) {
+      res.status(404).json({ status: "error", error: "Not found" })
+    }
+    res.status(200).json({ status: "succes", payload: result });
+  } catch (err) {
+    res.status(500).json({ status: "error", error: err.message });
+}}
+
 export const addProductToCartController = async (req, res) => {
     try {
         const cid = req.params.cid;
         const pid = req.params.pid;
-        const cartToUpdate = await cartsModel.findById(cid);
+        const cartToUpdate = await getCart(cid);
         if (cartToUpdate === null) {
           return res
             .status(404)
             .json({ status: "error", error: `Cart with id ${cid} Not found` });
         }
-        const productToAdd = await productsModel.findById(pid);
+        const productToAdd = await getProduct(pid);
         if (productToAdd === null) {
           return res
             .status(404)
@@ -62,9 +67,7 @@ export const addProductToCartController = async (req, res) => {
         } else {
           cartToUpdate.products.push({ product: pid, quantity: 1 });
         }
-        const result = await cartsModel.findByIdAndUpdate(cid, cartToUpdate, {
-          returnDocument: "after",
-        });
+        const result = await updateCart(cid, cartToUpdate, {new: true});
         res.status(201).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -74,13 +77,13 @@ export const deleteProductInCartController = async (req, res) => {
     try {
         const cid = req.params.cid;
         const pid = req.params.pid;
-        const cartToUpdate = await cartsModel.findById(cid);
+        const cartToUpdate = await getCart(cid);
         if (cartToUpdate === null) {
           return res
             .status(404)
             .json({ status: "error", error: `Cart with id ${cid} not found` });
         }
-        const productToDelete = await productsModel.findById(pid);
+        const productToDelete = await getProduct(pid);
         if (productToDelete === null) {
           return res
             .status(404)
@@ -99,9 +102,7 @@ export const deleteProductInCartController = async (req, res) => {
             (item) => item.product.toString() !== pid
           );
         }
-        const result = await cartsModel.findByIdAndUpdate(cid, cartToUpdate, {
-          returnDocument: "after",
-        });
+        const result = await updateCart(cid, cartToUpdate, { new: true });
         res.status(200).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -110,16 +111,14 @@ export const deleteProductInCartController = async (req, res) => {
 export const deleteAllProductsfromCartController = async (req, res) => {
     try {
         const cid = req.params.cid;
-        const cartToUpdate = await cartsModel.findById(cid);
+        const cartToUpdate = await getCart(cid);
         if (cartToUpdate === null) {
           return res
             .status(404)
             .json({ status: "error", error: `Cart with id=${cid} Not found` });
         }
         cartToUpdate.products = [];
-        const result = await cartsModel.findByIdAndUpdate(cid, cartToUpdate, {
-          returnDocument: "after",
-        });
+        const result = await updateCart(cid, cartToUpdate, { new: true });
         res.status(200).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -128,7 +127,7 @@ export const deleteAllProductsfromCartController = async (req, res) => {
 export const putProductsInCartController = async (req, res) => {
     try {
         const cid = req.params.cid;
-        const cartToUpdate = await cartsModel.findById(cid);
+        const cartToUpdate = await getCart(cid);
         if (cartToUpdate === null) {
           return res
             .status(404)
@@ -161,7 +160,7 @@ export const putProductsInCartController = async (req, res) => {
               .status(400)
               .json({ status: "error", error: `Product quantity cannot be 0` });
           }
-          const productToAdd = await productsModel.findById(products[i].product);
+          const productToAdd = await getProduct(products[i].product);
           if (productToAdd === null) {
             return res.status(400).json({
               status: "error",
@@ -170,9 +169,7 @@ export const putProductsInCartController = async (req, res) => {
           }
         }
         cartToUpdate.products = products;
-        const result = await cartsModel.findByIdAndUpdate(cid, cartToUpdate, {
-          returnDocument: "after",
-        });
+        const result = await updateCart(cid, cartToUpdate, {new: true});
         res.status(200).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -182,13 +179,13 @@ export const updateQuantityProductFromCartController = async (req, res) => {
     try {
         const cid = req.params.cid;
         const pid = req.params.pid;
-        const cartToUpdate = await cartsModel.findById(cid);
+        const cartToUpdate = await getCart(cid);
         if (cartToUpdate === null) {
           return res
             .status(404)
             .json({ status: "error", error: `Cart with id=${cid} Not found` });
         }
-        const productToUpdate = await productsModel.findById(pid);
+        const productToUpdate = getProduct(pid);
         if (productToUpdate === null) {
           return res.status(404).json({
             status: "error",
@@ -225,9 +222,7 @@ export const updateQuantityProductFromCartController = async (req, res) => {
           cartToUpdate.products[productIndex].quantity = quantity;
         }
     
-        const result = await cartsModel.findByIdAndUpdate(cid, cartToUpdate, {
-          returnDocument: "after",
-        });
+        const result = await updateCart(cid, cartToUpdate, {new: true});
         res.status(200).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -235,7 +230,7 @@ export const updateQuantityProductFromCartController = async (req, res) => {
 }
 //-----controllers de /carts----- en view.router
 export const getProductsFromCartController = async (req, res) => {
-  const result = await getProductsFromCart(req, res);
+  const result = await getCartController(req, res);
   if (result.statusCode === 200) {
     res.render("productsFromCart", {
       cart: result.response.payload,

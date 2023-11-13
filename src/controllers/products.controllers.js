@@ -1,77 +1,16 @@
-import productsModel from "../dao/models/products.model.js";
 import { PORT } from "../app.js";
+import { getAllProducts, getProduct, create, update, deleteById, getAllPaginate } from "../dao/mongoDao/productsDao.js";
 
 //-----controllers de api/products-----
-export const getProducts = async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit) || 10;
-      const page = parseInt(req.query.page) || 1;
-      const paginateOptions = { lean: true, limit, page };
-  
-      const filterOptions = {};
-      if (req.query.stock) filterOptions.stock = req.query.stock;
-      if (req.query.category) filterOptions.category = req.query.category;
-      if (req.query.sort === "asc") paginateOptions.sort = { price: 1 };
-      if (req.query.sort === "desc") paginateOptions.sort = { price: -1 };
-      const result = await productsModel.paginate(filterOptions, paginateOptions);
-  
-      let prevLink;
-      if (!req.query.page) {
-        prevLink = `http://${req.hostname}:${PORT}${req.originalUrl}&page=${result.prevPage}`;
-      } else {
-        const modifiedUrl = req.originalUrl.replace(
-          `page=${req.query.page}`,
-          `page=${result.prevPage}`
-        );
-        prevLink = `http://${req.hostname}:${PORT}${modifiedUrl}`;
-      }
-      let nextLink;
-      if (!req.query.page) {
-        nextLink = `http://${req.hostname}:${PORT}${req.originalUrl}&page=${result.nextPage}`;
-      } else {
-        const modifiedUrl = req.originalUrl.replace(
-          `page=${req.query.page}`,
-          `page=${result.nextPage}`
-        );
-        nextLink = `http://${req.hostname}:${PORT}${modifiedUrl}`;
-      }
-      if (page > result.totalPages) {
-        return {
-          statusCode: 404,
-          response: { status: "error", error: "not found" },
-        }
-      }
-      return {
-        statusCode: 200,
-        response: {
-          status: "success",
-          payload: result.docs,
-          totalPages: result.totalPages,
-          prevPage: result.prevPage,
-          nextPage: result.nextPage,
-          page: result.page,
-          hasPrevPage: result.hasPrevPage,
-          hasNextPage: result.hasNextPage,
-          prevLink: result.hasPrevPage ? prevLink : null,
-          nextLink: result.hasNextPage ? nextLink : null,
-          totalPages0: result.totalPages == 0 && true,
-        },
-      };
-    } catch (err) {
-      return {
-        statusCode: 500,
-        response: { status: "error", error: err.message },
-      };
-    }
-  };
+
 export const getProductsController = async (req, res) => {
-    const result = await getProducts(req, res);
+    const result = await getAllProducts();
     res.status(result.statusCode).json(result.response)
 }
-export const getProductByIdController = async (req, res) => {
+export const getProductController = async (req, res) => {
     try {
         const id = req.params.pid;
-        const result = await productsModel.findById(id).lean().exec();
+        const result = await getProduct(id);
         if (result === null) {
           return res.status(404).json({ status: "error", error: "Not found" });
         }
@@ -83,8 +22,8 @@ export const getProductByIdController = async (req, res) => {
 export const createProductController =async (req, res) => {
     try {
         const product = req.body;
-        const result = await productsModel.create(product);
-        const products = await productsModel.find().lean().exec();
+        const result = await create(product);
+        const products = await getAllProducts();
         res.status(201).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -94,13 +33,16 @@ export const modifyProductByIdController =async (req, res) => {
     try {
         const id = req.params.pid;
         const data = req.body;
-        const result = await productsModel.findByIdAndUpdate(id, data, {
+        /* const result = await productsModel.findByIdAndUpdate(id, data, {
+          returnDocument: "after",
+        }); */
+        const result = await update(id, data, {
           returnDocument: "after",
         });
         if (result === null) {
           return res.status(404).json({ status: "error", error: "Not found" });
         }
-        const products = await productsModel.find().lean().exec();
+        const products = await getAllProducts(); // Esto es necesario?
         res.status(200).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -109,11 +51,11 @@ export const modifyProductByIdController =async (req, res) => {
 export const deleteProductByIdController =async (req, res) => {
     try {
         const id = req.params.pid;
-        const result = await productsModel.findByIdAndDelete(id);
+        const result = await deleteById(id);
         if (result === null) {
           return res.status(404).json({ status: "error", error: "Not found" });
         }
-        const products = await productsModel.find().lean().exec();
+        const products = await getAllProducts();
         res.status(200).json({ status: "success", payload: products });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -122,8 +64,7 @@ export const deleteProductByIdController =async (req, res) => {
 
 //-----controllers de /products----- en view.router
 export const realTimeProductsController =async (req, res) => {
-    //const products = await productManager.getProducts();
-    const result = await getProducts(req, res);
+    const result = await getAllPaginate(req);
     if (result.statusCode === 200) {
       res.render("realTimeProducts", { products: result.response.payload });
     } else {
@@ -136,8 +77,8 @@ export const realTimeProductsController =async (req, res) => {
         //TODO: ahora el home renderiza productos, debería haber una pagina de bienvenida a la cual redireccionar
     }
 }
-export const homeProductsController =async (req, res) => {
-    const result = await getProducts(req, res);
+export const homeProductsController = async (req, res) => {
+    const result = await getAllPaginate(req);
   if (result.statusCode === 200) {
     const totalPages = [];
     let link;
