@@ -1,16 +1,16 @@
 import { PORT } from "../app.js";
-import { getAllProducts, getProduct, create, update, deleteById, getAllPaginate } from "../dao/mongoDao/productsDao.js";
+import { ProductService } from "../services/index.js";
 
 //-----controllers de api/products-----
 
 export const getProductsController = async (req, res) => {
-    const result = await getAllProducts();
+    const result = await ProductService.getAll()
     res.status(result.statusCode).json(result.response)
 }
 export const getProductController = async (req, res) => {
     try {
         const id = req.params.pid;
-        const result = await getProduct(id);
+        const result = await ProductService.getById(id);
         if (result === null) {
           return res.status(404).json({ status: "error", error: "Not found" });
         }
@@ -22,8 +22,8 @@ export const getProductController = async (req, res) => {
 export const createProductController =async (req, res) => {
     try {
         const product = req.body;
-        const result = await create(product);
-        const products = await getAllProducts();
+        const result = await ProductService.create(product);
+        const products = await ProductService.getAll();
         res.status(201).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -36,13 +36,13 @@ export const modifyProductByIdController =async (req, res) => {
         /* const result = await productsModel.findByIdAndUpdate(id, data, {
           returnDocument: "after",
         }); */
-        const result = await update(id, data, {
+        const result = await ProductService.update(id, data, {
           returnDocument: "after",
         });
         if (result === null) {
           return res.status(404).json({ status: "error", error: "Not found" });
         }
-        const products = await getAllProducts(); // Esto es necesario?
+        const products = await ProductService.getAll(); // Esto es necesario?
         res.status(200).json({ status: "success", payload: result });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -51,11 +51,11 @@ export const modifyProductByIdController =async (req, res) => {
 export const deleteProductByIdController =async (req, res) => {
     try {
         const id = req.params.pid;
-        const result = await deleteById(id);
+        const result = await ProductService.delete(id);
         if (result === null) {
           return res.status(404).json({ status: "error", error: "Not found" });
         }
-        const products = await getAllProducts();
+        const products = await ProductService.getAll();
         res.status(200).json({ status: "success", payload: products });
       } catch (err) {
         res.status(500).json({ status: "error", error: err.message });
@@ -64,7 +64,7 @@ export const deleteProductByIdController =async (req, res) => {
 
 //-----controllers de /products----- en view.router
 export const realTimeProductsController =async (req, res) => {
-    const result = await getAllPaginate(req);
+    const result = await ProductService.getAllPaginate(req);
     if (result.statusCode === 200) {
       res.render("realTimeProducts", { products: result.response.payload });
     } else {
@@ -78,7 +78,7 @@ export const realTimeProductsController =async (req, res) => {
     }
 }
 export const homeProductsController = async (req, res) => {
-    const result = await getAllPaginate(req);
+    const result = await ProductService.getAllPaginate(req);
   if (result.statusCode === 200) {
     const totalPages = [];
     let link;
