@@ -88,7 +88,7 @@ export const getAllPaginate = async (req) => {
 export default class ProductMongoDAO {
     getAll = async() => await productsModel.find().lean().exec()
     getById = async(id) => await productsModel.findById(id).lean().exec();
-    getAllPaginate = async(req) => {
+    getAllPaginate = async(req, options) => {
       try {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
@@ -151,6 +151,6 @@ export default class ProductMongoDAO {
       }
     }
     create = async(product) => await productsModel.create(product)
-    update = async(id, data) => await productsModel.findByIdAndUpdate(id, data)
+    update = async(id, data, options) => await productsModel.findByIdAndUpdate(id, data, options)
     delete = async(id) => await productsModel.findByIdAndDelete(id);
 }

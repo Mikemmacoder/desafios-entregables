@@ -19,4 +19,9 @@ router.post("/", createProductController);
 router.put("/:pid", modifyProductByIdController);
 router.delete("/:pid", deleteProductByIdController);
 
+/* router.get("/", handlePolicies(['USER', 'ADMIN']), getProductsController);
+router.get("/:pid", handlePolicies(['USER', 'ADMIN']), getProductController);
+router.post("/", handlePolicies(['ADMIN']), createProductController);
+router.put("/:pid", handlePolicies(['ADMIN']), modifyProductByIdController);
+router.delete("/:pid", handlePolicies(['ADMIN']), deleteProductByIdController); */
 export default router;

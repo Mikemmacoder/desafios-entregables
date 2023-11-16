@@ -5,8 +5,8 @@ export default class ProductRepository {
     }
     getAll = async() => await this.dao.getAll()
     getById = async(id) => await this.dao.getById(id)
-    getAllPaginate = async(req) => await this.dao.getAllPaginate(req, PORT)
+    getAllPaginate = async(req, options) => await this.dao.getAllPaginate(req, options)
     create = async(product) => await this.dao.create(product)
-    update = async(id, data) => await this.dao.update(id, data)
+    update = async(id, data, options) => await this.dao.update(id, data, options)
     delete = async(id) => await this.dao.delete(id)
 }

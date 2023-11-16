@@ -4,7 +4,7 @@ import { ProductService } from "../services/index.js";
 //-----controllers de api/products-----
 
 export const getProductsController = async (req, res) => {
-    const result = await ProductService.getAll()
+    const result = await ProductService.getAllPaginate(req)
     res.status(result.statusCode).json(result.response)
 }
 export const getProductController = async (req, res) => {
@@ -36,9 +36,7 @@ export const modifyProductByIdController =async (req, res) => {
         /* const result = await productsModel.findByIdAndUpdate(id, data, {
           returnDocument: "after",
         }); */
-        const result = await ProductService.update(id, data, {
-          returnDocument: "after",
-        });
+        const result = await ProductService.update(id, data, { new: true});
         if (result === null) {
           return res.status(404).json({ status: "error", error: "Not found" });
         }
@@ -64,7 +62,7 @@ export const deleteProductByIdController =async (req, res) => {
 
 //-----controllers de /products----- en view.router
 export const realTimeProductsController =async (req, res) => {
-    const result = await ProductService.getAllPaginate(req);
+    const result = await ProductService.getAllPaginate(req, { new: true});
     if (result.statusCode === 200) {
       res.render("realTimeProducts", { products: result.response.payload });
     } else {

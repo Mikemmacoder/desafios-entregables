@@ -38,6 +38,11 @@ document.getElementById("createBtn").addEventListener("click", () => {
 });
 
 deleteProduct = (id) => {
+  if (id === undefined) {
+    alert("ID del producto no definido. No se puede eliminar.");
+    return;
+  }
+  console.log(id)
   fetch(`/api/products/${id}`, {
     method: "delete",
   })
@@ -65,7 +70,7 @@ socket.on("updatedProducts", (data) => {
     let tr = document.createElement("tr");
     tr.innerHTML = `
           <td><button
-              onclick="deleteProduct(${product.id})"
+              onclick="deleteProduct('${product._id}')"
             >Eliminar</button></td>
           <td>${product.title}</td>
           <td>${product.description}</td>

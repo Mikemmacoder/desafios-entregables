@@ -1,4 +1,5 @@
 import { JWT_COOKIE_NAME, generateToken } from "../utils/utils.js";
+import UserDTO from "../dto/user.dto.js";
 
 //-----controllers de api/sessions----- en session.router
 export const registerController =(req, res) => {
@@ -44,10 +45,11 @@ const registerFailure = req.query.registerFailure === 'true'
 } 
 
 export const getLoginController =async (req, res) => {
-    const registerSuccess = req.query.registerSuccess === 'true'
+  const registerSuccess = req.query.registerSuccess === 'true'
   const error = req.query.error === 'true'
   res.render("sessions/login", {registerSuccess, error}); //referencia a la carpeta sessions y a la vista login
 } 
 export const getProfileController =async (req, res) => {
-    res.render("sessions/profile", req.user); //referencia a la carpeta sessions y a la vista profile
+  const userDTO = new UserDTO(req.user)
+  res.render("sessions/profile", userDTO); //referencia a la carpeta sessions y a la vista profile
 } 
