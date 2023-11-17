@@ -12,7 +12,7 @@ export const loginController =async (req, res) => {
           .status(400)
           .send({ status: "error", error: "Invalid credentials" });
       }
-        res.cookie(JWT_COOKIE_NAME, req.user.token).redirect("/products");
+      res.cookie(JWT_COOKIE_NAME, req.user.token).redirect("/products");
 }
 export const failLoginController =async (req, res) => {
     res.send({ error: "Passport login failed" })
