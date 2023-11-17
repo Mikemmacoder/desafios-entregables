@@ -8,6 +8,7 @@ import cartRouter from "./routers/carts.router.js";
 import viewRouter from "./routers/view.router.js";
 import sessionViewRouter from "./routers/sessionViewRouter.js";
 import sessionRouter from "./routers/sessionRouter.js";
+import chatRouter from './routers/chat.router.js'
 import { Server } from "socket.io";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -42,6 +43,8 @@ app.use(
 app.set("views", "./src/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./src/public"));
+
+
 export const PORT = config.apiserver.port;
 
 initializePassport();
@@ -63,10 +66,10 @@ try {
   app.use("/", sessionViewRouter);
   app.use("/api/sessions", sessionRouter);
   app.use("/api/products", productRouter);
-  app.use("/api/carts", cartRouter);
-  app.use("/products", passportCall('jwt'), handlePolicies(['ADMIN', 'USER']), viewRouter);
+  app.use("/api/carts", handlePolicies(['USER']), cartRouter);
+  app.use("/products", passportCall('jwt'), viewRouter);
   app.use("/carts", viewRouter);
-  //app.use("/chat", chatRouter);
+  app.use("/chat", chatRouter);
 
   socketServer.on("connection", (socket) => {
     console.log(`Nuevo cliente conectado: ${socket.id}`);
@@ -74,12 +77,8 @@ try {
       socketServer.emit("updatedProducts", data);
     });
   });
-} catch (err) {
-  console.log(err.message);
-  process.exit(-1);
-}
-
-/* const messages = [];
+  
+const messages = [];
 
 socketServer.on("connection", (socketClient) => {
   console.log(`Nuevo cliente conectado: ${socketClient.id}`);
@@ -87,4 +86,9 @@ socketServer.on("connection", (socketClient) => {
     messages.push(data);
     socketServer.emit("logs", messages);
   });
-}); */
+}); 
+} catch (err) {
+  console.log(err.message);
+  process.exit(-1);
+}
+

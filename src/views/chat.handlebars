@@ -1,9 +1,8 @@
-<h1>Super Chat de Coder</h1>
+<h1>CHAT</h1>
 <div>
-  <i id="username"></i><input id="chatbox" type="text" />
+  <i id="username">{{user.first_name}} {{user.last_name}}</i><input id="chatbox" type="text" />
 </div>
 <div id="log"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="index.js"></script>
+<script src="/chat.js"></script>

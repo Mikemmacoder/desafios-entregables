@@ -37,3 +37,18 @@ export const passportCall = strategy => {
       })(req, res, next)
   }
 }
+
+// jwtUtils.js
+
+// Ajusta la importación según la ubicación de tu archivo de configuración
+
+export const verifyToken = (token) => {
+  try {
+    const decodedToken = jwt.verify(token, JWT_PRIVATE_KEY);
+    return decodedToken;
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
+};
+
+
