@@ -1,5 +1,8 @@
 import { PORT } from "../app.js";
 import { ProductService } from "../services/index.js";
+import EErros from "../services/errors/enums.js";
+import CustomError from "../services/errors/custom.errors.js";
+import { generateErrorInfo } from "../services/errors/info.js";
 
 //-----controllers de api/products-----
 
@@ -22,6 +25,14 @@ export const getProductController = async (req, res) => {
 export const createProductController =async (req, res) => {
     try {
         const product = req.body;
+        if (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.status || !product.category ) {
+          CustomError.createError({
+              name: "User creation error",
+              cause: generateErrorInfo(product),
+              message: "Error trying to create a product" + generateErrorInfo(product),
+              code: EErros.INVALID_TYPES_ERROR
+          })
+        }
         const result = await ProductService.create(product);
         const products = await ProductService.getAll();
         res.status(201).json({ status: "success", payload: result });

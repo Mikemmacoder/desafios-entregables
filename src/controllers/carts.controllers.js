@@ -3,6 +3,9 @@ import { ProductService } from "../services/index.js";
 import { TicketService } from "../services/index.js";
 import shortid from "shortid";
 import usersModel from "../dao/mongoDao/models/usersModel.js";
+import { JWT_COOKIE_NAME } from "../utils/utils.js";
+import { verifyToken } from "../utils/utils.js";
+
 //-----controllers de api/carts-----
 /* export const getProductsFromCart = async (req, res) => {
     try {
@@ -35,7 +38,13 @@ export const createCartController = async (req, res) => {
 }
 export const getCartController = async (req, res) => {
   try {
-    const id = req.params.cid;
+    const token = req.cookies[JWT_COOKIE_NAME];
+    if (!token) {
+      return res.status(401).render('errors/base', { error: 'Unauthorized' });
+    }
+    const decodedToken = verifyToken(token);
+    console.log (decodedToken.user.cart)
+    const id = decodedToken.user.cart || req.params.cid
     const result = await CartService.geProducts(id)
     if (result === null) {
       return {

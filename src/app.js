@@ -9,6 +9,7 @@ import viewRouter from "./routers/view.router.js";
 import sessionViewRouter from "./routers/sessionViewRouter.js";
 import sessionRouter from "./routers/sessionRouter.js";
 import chatRouter from './routers/chat.router.js'
+import mockRouter from './routers/mock.router.js'
 import { Server } from "socket.io";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -16,11 +17,13 @@ import { passportCall } from "./utils/utils.js";
 import cookieParser from "cookie-parser";
 import { handlePolicies } from "./middlewares/handlePolicies.js";
 import config from "./config/config.js";
+import errorHandler from './middlewares/error.js'
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
+app.use(errorHandler)
 
 import exphbs from "express-handlebars";
 const hbs = exphbs.create({
@@ -70,6 +73,8 @@ try {
   app.use("/products", passportCall('jwt'), viewRouter);
   app.use("/carts", viewRouter);
   app.use("/chat", chatRouter);
+  app.use("/mockingproducts", mockRouter);
+
 
   socketServer.on("connection", (socket) => {
     console.log(`Nuevo cliente conectado: ${socket.id}`);

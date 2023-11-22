@@ -9,6 +9,7 @@ import passport from "passport";
 import jwt  from "jsonwebtoken";
 import handlebars from 'handlebars';
 import config from "../config/config.js";
+import { faker } from '@faker-js/faker';
 
 export const createHash = (password) =>
   bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -51,4 +52,16 @@ export const verifyToken = (token) => {
   }
 };
 
+export const generateProduct = () => {
+  return {
+    title: faker.commerce.product(),
+  description: faker.commerce.productDescription(),
+  price: faker.commerce.price({ min: 19000, max: 200000, dec: 0, symbol: '$' }),
+  //thumbnails: ,
+  code: faker.commerce.isbn() ,
+  stock: faker.number.int({ min: 0, max: 100 }),
+  status: true ,
+  category: faker.commerce.productMaterial(),
+  }
+}
 

@@ -18,7 +18,9 @@
   <p><a href="/profile">{{user.email}}</a>
     - role:{{user.role}}
     - [
-    <a href="/api/sessions/logout">Logout</a>]</p>
+    <a href="/api/sessions/logout">Logout</a>]
+    <strong><a href="/carts/:cid">Cart</a></strong>
+    </p>
   <hr />
   <div>
     {{#if paginateInfo.hasPrevPage}}
