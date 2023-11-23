@@ -43,7 +43,6 @@ export const getCartController = async (req, res) => {
       return res.status(401).render('errors/base', { error: 'Unauthorized' });
     }
     const decodedToken = verifyToken(token);
-    console.log (decodedToken.user.cart)
     const id = decodedToken.user.cart || req.params.cid
     const result = await CartService.geProducts(id)
     if (result === null) {
