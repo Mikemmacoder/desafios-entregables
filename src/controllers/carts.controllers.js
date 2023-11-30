@@ -301,7 +301,8 @@ export const purchaseController = async(req, res) => {
           amount,
           purchaser: user.email
       })
-      return res.status(201).json({ status: 'success', payload: result })
+      console.log('ticket: ' + result)
+      return res.status(201).send({ status: 'success', payload: result })
   } catch(err) {
       return res.status(500).json({ status: 'error', error: err.message })
   }

@@ -82,6 +82,12 @@ try {
       socketServer.emit("updatedProducts", data);
     });
   });
+  socketServer.on("connection", (socketCart) => {
+    console.log(`SocketCart conectado`);
+    socketCart.on("Cart", (updatedCart) => {
+      socketServer.emit("UpdateCart", updatedCart);
+    });
+  });
   
 const messages = [];
 

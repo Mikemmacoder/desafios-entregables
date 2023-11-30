@@ -54,6 +54,22 @@ deleteProduct = (id) => {
     })
     .catch((err) => alert(`Ocurrió un error: ${err}`));
 };
+deleteProdFromCart = (pid, cid) => {
+  if (pid === undefined) {
+    alert("ID del producto no definido. No se puede eliminar.");
+    return;
+  }
+  console.log(pid + cid)
+  fetch(`/api/carts/cid/products/pid`, {
+    method: "delete",
+  })
+    .then((result) => result.json())
+    .then((result) => {
+      if (result.status === "error") throw new Error(result.error);
+      alert("El producto ha sido eliminado");
+    })
+    .catch((err) => alert(`Ocurrió un error: ${err}`));
+};
 
 socket.on("updatedProducts", (data) => {
   table.innerHTML = `<tr>

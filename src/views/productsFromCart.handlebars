@@ -3,6 +3,7 @@
 <hr />
 {{#if (eq cart.products.length 0)}}
   <p>No hay productos en el carrito</p>
+  
 {{else}}
   <table>
     <thead>
@@ -13,6 +14,7 @@
         <td><strong>Código</strong></td>
         <td><strong>Stock</strong></td>
         <td><strong>Cantidad</strong></td>
+        <td><strong>Eliminar</strong></td>
       </tr>
     </thead>
     <tbody>
@@ -23,9 +25,117 @@
           <td>{{this.product.price}}</td>
           <td>{{this.product.code}}</td>
           <td>{{this.product.stock}}</td>
-          <td>{{this.quantity}}</td>
+          <td><button onclick="decrementProdQuantity('{{this.product._id}}', '{{this.quantity}}')">-</button>
+          {{this.quantity}}
+          <button onclick="incrementProductQuantity('{{this.product._id}}', '{{this.quantity}}', '{{this.product.stock}}')">+</button></td>
+          <td><button onclick="deleteProdFromCart('{{this.product._id}}')">Eliminar</button></td>
         </tr>
       {{/each}}
     </tbody>
   </table>
+  <button onclick="finalizePurchase()">Finalizar compra</button>
 {{/if}}
+
+<a href="/products">< Volver a productos</a>
+
+<script>
+  
+const deleteProdFromCart = (pid) => {
+  const cid = {{{json cart._id}}}
+  console.log("ID del carrito:", cid);
+  console.log("ID del producto:", pid);
+  if (pid === undefined) {
+    alert("ID del producto no definido. No se puede eliminar.");
+    return;
+  }
+  if (cid === undefined) {
+    alert("ID del carrito no definido.");
+    return;
+  }
+  fetch(`/api/carts/${cid}/products/${pid}`, {
+    method: "delete",
+  })
+    .then(response => {
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    }
+    alert("El producto ha sido eliminado");
+  })
+  .catch(err => alert(`Ocurrió un error: ${err}`));
+}
+
+const incrementProductQuantity = ( pid, quantity, stock) => { 
+  console.log('quantity: ' + quantity + '. Stock: ' + stock)
+  if (stock > quantity) { 
+    const cid = {{{json cart._id}}}
+    fetch(`/api/carts/${cid}/products/${pid}`, { 
+      method: 'post' 
+    }) 
+    .then(result => result.json()) 
+    .then(result => { 
+      if (result.status ==='error') throw new Error(result.error) 
+        alert(`Se ha actualizado la cantidad de productos :)`) 
+      }) 
+    .catch(err => alert(`Ocurrió un error :(\n${err}`)) 
+  }else{
+    alert(`Has alcanzado el máximo del producto`)
+  }
+//TODO: arreglar error. Cuando agrego 2 productos me dice que he alcanzado el limite, aun habiendo stock
+}
+
+const decrementProdQuantity = (pid, quantity) => {
+  const cid = {{{json cart._id}}};
+  if (quantity == 1) {
+    deleteProdFromCart(pid)
+    return 
+  }
+  const newQuantity = quantity - 1
+  fetch(`/api/carts/${cid}/products/${pid}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ quantity: newQuantity }),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(result => {
+      alert('Se ha actualizado la cantidad de productos');
+    })
+    .catch(error => {
+      alert('Ocurrió un error:', error);
+    });
+};
+
+const finalizePurchase = () => {
+  const cid = {{{json cart._id}}};
+  console.log('cid:' + cid)
+  fetch(`/api/carts/${cid}/purchase`, { 
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+      }
+      console.log(response)
+      return response.json();
+    })
+    .then(result => { 
+      console.log(result)
+      alert('Compra finalizada con éxito');
+      //TODO: REDIRECCIONAR A VISTA CON LOS PRODUCTOS COMPRADOS
+      //ENVIAR MAIL
+    })
+    .catch(error => {
+      alert('Ocurrió un error:', error);
+    });
+};
+
+
+</script>

@@ -29,7 +29,7 @@ export const createProductController =async (req, res) => {
           CustomError.createError({
               name: "User creation error",
               cause: generateErrorInfo(product),
-              message: "Error trying to create a product" + generateErrorInfo(product),
+              message: "Product creation error" + generateErrorInfo(product),
               code: EErros.INVALID_TYPES_ERROR
           })
         }
