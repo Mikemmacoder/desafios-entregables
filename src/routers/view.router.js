@@ -7,7 +7,7 @@ const router = Router();
 
 router.get("/", publicRoutes, handlePolicies(['USER', 'ADMIN']), homeProductsController);
 router.get("/realTimeProducts", publicRoutes, handlePolicies(['ADMIN']), realTimeProductsController);
-router.get("/:cid", publicRoutes, handlePolicies(['USER', 'ADMIN']), getProductsFromCartController);
+router.get("/:cid", publicRoutes, handlePolicies(['USER']), getProductsFromCartController);
 
 /* router.get("/create", async (req, res) => {
   res.render("create", {});

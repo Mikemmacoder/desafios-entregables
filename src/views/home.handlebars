@@ -19,8 +19,14 @@
     - role:{{user.role}}
     - [
     <a href="/api/sessions/logout">Logout</a>]
-    <strong><a href="/carts/:cid">Cart</a></strong>
-    </p>
+  </p>
+    {{#if (eq user.role "user")}}
+      <strong><a href="/carts/:cid">Cart</a></strong>
+      <strong><a href="/chat">Chat</a></strong>
+    {{/if}}
+    {{#if (eq user.role "admin")}}
+      <strong><a href="/products/realtimeproducts">Administrar productos</a></strong>
+    {{/if}}
   <hr />
   <div>
     {{#if paginateInfo.hasPrevPage}}
@@ -39,7 +45,9 @@
   <table>
     <thead>
       <tr>
+        {{#if (eq user.role "user")}}
         <td></td>
+        {{/if}}
         <td>Nombre</td>
         <td>Descripción</td>
         <td>Precio</td>
@@ -50,11 +58,10 @@
       </tr>
     </thead>
     <tbody>
+    {{#if (eq user.role "user")}}
       {{#each products}}
         <tr>
-          <td><button
-              onclick="addProductToCart('{{this._id}}')"
-            >AddToCart</button></td>
+          <td><button onclick="addProductToCart('{{this._id}}')">AddToCart</button></td>
           <td>{{this.title}}</td>
           <td>{{this.description}}</td>
           <td>{{this.price}}</td>
@@ -64,6 +71,20 @@
           <td>{{this.status}}</td>
         </tr>
       {{/each}}
+      {{/if}}
+      {{#if (eq user.role "admin")}}
+      {{#each products}}
+        <tr>
+          <td>{{this.title}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.price}}</td>
+          <td>{{this.stock}}</td>
+          <td>{{this.code}}</td>
+          <td>{{this.category}}</td>
+          <td>{{this.status}}</td>
+        </tr>
+      {{/each}}
+      {{/if}}
     </tbody>
   </table>
 </div>

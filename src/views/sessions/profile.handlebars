@@ -11,6 +11,8 @@
 <div>
   <a href="/products">Products</a>
   | 
-  <a href="/carts/:cid">Cart</a> | [
-  <a href="/api/sessions/logout">Logout</a>]
+  {{#if (eq user.role "user")}}
+      <a href="/carts/:cid">Cart</a> |
+  {{/if}}
+  <a href="/api/sessions/logout">[Logout]</a>
 </div>
