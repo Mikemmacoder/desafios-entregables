@@ -17,7 +17,7 @@
         <td><strong>Eliminar</strong></td>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="tbody">
       {{#each cart.products}}
         <tr>
           <td>{{this.product.title}}</td>
@@ -25,10 +25,10 @@
           <td>{{this.product.price}}</td>
           <td>{{this.product.code}}</td>
           <td>{{this.product.stock}}</td>
-          <td><button onclick="decrementProdQuantity('{{this.product._id}}', '{{this.quantity}}')">-</button>
+          <td><button id="btnRest" onclick="decrementProdQuantity('{{this.product._id}}', '{{this.quantity}}')">-</button>
           {{this.quantity}}
-          <button onclick="incrementProductQuantity('{{this.product._id}}', '{{this.quantity}}', '{{this.product.stock}}')">+</button></td>
-          <td><button onclick="deleteProdFromCart('{{this.product._id}}')">Eliminar</button></td>
+          <button id="btnAdd" onclick="incrementProductQuantity('{{this.product._id}}', '{{this.quantity}}', '{{this.product.stock}}')">+</button></td>
+          <td><button id="btnDelelte" onclick="deleteProdFromCart('{{this.product._id}}')">Eliminar</button></td>
         </tr>
       {{/each}}
     </tbody>
@@ -38,12 +38,11 @@
 
 <a href="/products">< Volver a productos</a>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  
+const socketCart = io(); 
 const deleteProdFromCart = (pid) => {
-  const cid = {{{json cart._id}}}
-  console.log("ID del carrito:", cid);
-  console.log("ID del producto:", pid);
+  const cid = {{{json cart._id}}};
   if (pid === undefined) {
     alert("ID del producto no definido. No se puede eliminar.");
     return;
@@ -55,17 +54,19 @@ const deleteProdFromCart = (pid) => {
   fetch(`/api/carts/${cid}/products/${pid}`, {
     method: "delete",
   })
-    .then(response => {
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} - ${response.statusText}`);
-    }
-    alert("El producto ha sido eliminado");
-  })
-  .catch(err => alert(`Ocurrió un error: ${err}`));
+    .then(response => response.json())
+    .then(result => {
+      if (result.status === "error") {
+        throw new Error(result.error);
+      }
+      alert("El producto ha sido eliminado");
+      socketCart.emit('productsList', cid);
+    })
+
+    .catch(err => alert(`Ocurrió un error: ${err}`));
 }
 
 const incrementProductQuantity = ( pid, quantity, stock) => { 
-  console.log('quantity: ' + quantity + '. Stock: ' + stock)
   if (stock > quantity) { 
     const cid = {{{json cart._id}}}
     fetch(`/api/carts/${cid}/products/${pid}`, { 
@@ -74,7 +75,8 @@ const incrementProductQuantity = ( pid, quantity, stock) => {
     .then(result => result.json()) 
     .then(result => { 
       if (result.status ==='error') throw new Error(result.error) 
-        alert(`Se ha actualizado la cantidad de productos :)`) 
+        socketCart.emit('productsList', cid); 
+        alert(`Se ha actualizado la cantidad de productos :)`)
       }) 
     .catch(err => alert(`Ocurrió un error :(\n${err}`)) 
   }else{
@@ -104,6 +106,7 @@ const decrementProdQuantity = (pid, quantity) => {
       return response.json();
     })
     .then(result => {
+      socketCart.emit('productsList', cid);
       alert('Se ha actualizado la cantidad de productos');
     })
     .catch(error => {
@@ -113,7 +116,6 @@ const decrementProdQuantity = (pid, quantity) => {
 
 const finalizePurchase = () => {
   const cid = {{{json cart._id}}};
-  console.log('cid:' + cid)
   fetch(`/api/carts/${cid}/purchase`, { 
     headers: {
       'Content-Type': 'application/json',
@@ -123,13 +125,13 @@ const finalizePurchase = () => {
       if (!response.ok) {
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }
-      console.log(response)
       return response.json();
     })
     .then(result => { 
-      console.log(result)
+      socketCart.emit('productsList', cid);
       alert('Compra finalizada con éxito');
       //TODO: REDIRECCIONAR A VISTA CON LOS PRODUCTOS COMPRADOS
+      //MOSTRAR MONTO TOTAL
       //ENVIAR MAIL
     })
     .catch(error => {
@@ -137,5 +139,32 @@ const finalizePurchase = () => {
     });
 };
 
+/////----------Socket----------/////
+
+socketCart.on("CartUpdated", (data) => {
+  updateCartView(data)
+});
+
+const updateCartView = (data) => {
+  const table = document.getElementById('tbody');
+  table.innerHTML = ''; 
+  for (product of data.products) {
+    const row = document.createElement("tr")
+    row.innerHTML = `
+      <td>${product.product.title}</td>
+      <td>${product.product.description}</td>
+      <td>${product.product.price}</td>
+      <td>${product.product.code}</td>
+      <td>${product.product.stock}</td>
+      <td>
+        <button id="btnRest" onclick="decrementProdQuantity('${product.product._id}', '${product.quantity}')">-</button>
+          ${product.quantity}
+          <button id="btnAdd" onclick="incrementProductQuantity('${product.product._id}', '${product.quantity}', '${product.product.stock}')">+</button></td>
+          <td><button id="btnDelelte" onclick="deleteProdFromCart('${product.product._id}')">Eliminar</button></td>
+    `
+    table.appendChild(row);
+  }
+}
 
 </script>
+

@@ -44,7 +44,7 @@ export const getCartController = async (req, res) => {
     }
     const decodedToken = verifyToken(token);
     const id = decodedToken.user.cart || req.params.cid
-    const result = await CartService.geProducts(id)
+    const result = await CartService.getProducts(id)
     if (result === null) {
       return {
         statusCode: 404,

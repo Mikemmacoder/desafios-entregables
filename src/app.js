@@ -18,6 +18,7 @@ import cookieParser from "cookie-parser";
 import { handlePolicies } from "./middlewares/handlePolicies.js";
 import config from "./config/config.js";
 import errorHandler from './middlewares/error.js'
+import { CartService } from "./services/index.js";
 
 const app = express();
 app.use(express.json());
@@ -83,9 +84,11 @@ try {
     });
   });
   socketServer.on("connection", (socketCart) => {
-    console.log(`SocketCart conectado`);
-    socketCart.on("Cart", (updatedCart) => {
-      socketServer.emit("UpdateCart", updatedCart);
+    console.log('socket server 2')
+    socketCart.on("productsList", async (cid) => {
+      const data = await CartService.getProducts(cid)
+      //console.log('data.products en socketServer' + JSON.stringify(data.products, null, 2))
+      socketServer.emit("CartUpdated", data);
     });
   });
   
