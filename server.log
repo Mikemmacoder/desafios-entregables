@@ -1,0 +1,25 @@
+{"level":"info","message":"DB conected","timestamp":"2023-12-05T12:09:17.815Z"}
+{"level":"info","message":"Server Up!","timestamp":"2023-12-05T12:09:17.834Z"}
+{"level":"info","message":"DB conected","timestamp":"2023-12-05T12:11:26.183Z"}
+{"level":"info","message":"Server Up!","timestamp":"2023-12-05T12:11:26.205Z"}
+{"level":"info","message":"Cart with id 65411cfc6487daf578ee8394 updated","timestamp":"2023-12-05T12:12:21.353Z"}
+{"level":"info","message":"User logged out","timestamp":"2023-12-05T12:12:24.003Z"}
+{"level":"info","message":"User accessed to cart with id 65411cfc6487daf578ee8394 . Products in cart: [object Object]","timestamp":"2023-12-05T12:12:31.371Z"}
+{"level":"info","message":"Nuevo cliente conectado: dPAISnV2CgFj2P3WAAAB","timestamp":"2023-12-05T12:12:31.584Z"}
+{"level":"info","message":"Nuevo cliente conectado: dPAISnV2CgFj2P3WAAAB","timestamp":"2023-12-05T12:12:31.585Z"}
+{"level":"info","message":"Product with id 656e619b7f377b73b2d37bc4 deleted from cart with id 65411cfc6487daf578ee8394","timestamp":"2023-12-05T12:12:36.424Z"}
+{"level":"info","message":"Cart with id 65411cfc6487daf578ee8394 updated","timestamp":"2023-12-05T12:12:42.285Z"}
+{"level":"info","message":"User accessed to cart with id 65411cfc6487daf578ee8394 . Products in cart: [object Object]","timestamp":"2023-12-05T12:12:47.325Z"}
+{"level":"info","message":"Nuevo cliente conectado: Qto1DC9oiSbFo73dAAAD","timestamp":"2023-12-05T12:12:47.547Z"}
+{"level":"info","message":"Nuevo cliente conectado: Qto1DC9oiSbFo73dAAAD","timestamp":"2023-12-05T12:12:47.547Z"}
+{"level":"info","message":"ticket: {\n  code: '3mYbmhcGZ',\n  products: [],\n  amount: 0,\n  purchaser: 'micaelafcavallero@gmail.com',\n  _id: new ObjectId(\"656f13c1a993d2d3f82ad391\"),\n  purchase_datetime: 2023-12-05T12:12:49.409Z,\n  updatedAt: 2023-12-05T12:12:49.409Z,\n  __v: 0\n}","timestamp":"2023-12-05T12:12:49.615Z"}
+{"level":"info","message":"Cart with id 65411cfc6487daf578ee8394 updated","timestamp":"2023-12-05T12:13:03.656Z"}
+{"level":"info","message":"User logged out","timestamp":"2023-12-05T12:13:06.433Z"}
+{"level":"info","message":"User accessed to cart with id 65411cfc6487daf578ee8394 . Products in cart: [object Object]","timestamp":"2023-12-05T12:13:17.926Z"}
+{"level":"info","message":"Nuevo cliente conectado: ea9Bot3fAagBDVmEAAAF","timestamp":"2023-12-05T12:13:18.145Z"}
+{"level":"info","message":"Nuevo cliente conectado: ea9Bot3fAagBDVmEAAAF","timestamp":"2023-12-05T12:13:18.146Z"}
+{"level":"info","message":"ticket: {\n  code: 'tcgpgTbrL',\n  products: [\n    {\n      product: new ObjectId(\"6516c2c34773373ceffe9061\"),\n      price: 9500,\n      quantity: 1\n    }\n  ],\n  amount: 9500,\n  purchaser: 'micaelafcavallero@gmail.com',\n  _id: new ObjectId(\"656f13e0a993d2d3f82ad3ab\"),\n  purchase_datetime: 2023-12-05T12:13:20.395Z,\n  updatedAt: 2023-12-05T12:13:20.395Z,\n  __v: 0\n}","timestamp":"2023-12-05T12:13:20.580Z"}
+{"level":"info","message":"Test de logger Info","timestamp":"2023-12-05T12:14:43.548Z"}
+{"level":"warning","message":"Test de logger Warning","timestamp":"2023-12-05T12:14:43.548Z"}
+{"level":"error","message":"Test de logger Error","timestamp":"2023-12-05T12:14:43.549Z"}
+{"level":"fatal","message":"Test de logger Fatal","timestamp":"2023-12-05T12:14:43.550Z"}

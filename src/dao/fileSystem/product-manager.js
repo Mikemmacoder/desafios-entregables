@@ -1,4 +1,5 @@
 import fs from "fs";
+import logger from "../../utils/logger";
 
 // ----- Creo la clase -----
 export class ProductManager {
@@ -57,21 +58,21 @@ export class ProductManager {
       status: Boolean(status),
       category,
     };
-    console.log("Código del nuevo producto:", newProduct.code);
+    logger.info("Código del nuevo producto:", newProduct.code);
     const exists = products.some((product) => product.code === newProduct.code);
-    console.log("exists" + exists);
+    logger.info("exists" + exists);
     if (exists) {
       return "El código " + newProduct.code + " ya existe en ProductManager";
     } else {
       products.push(newProduct);
       fs.writeFileSync(this.path, JSON.stringify(products));
-      console.log("se escribió");
+      logger.info("se escribió");
       return newProduct;
     }
   }
   getProducts() {
     if (!fs.existsSync(this.path)) {
-      console.log("El archivo no existe");
+      logger.warning("El archivo no existe");
       return [];
     }
 
@@ -121,7 +122,7 @@ export class ProductManager {
       const newArray = this.myArray.filter((el) => el.id !== id);
       this.myArray = newArray;
       fs.writeFileSync(this.path, JSON.stringify(newArray));
-      console.log(`El elemento de id ${id} ha sido eliminado`);
+      logger.info(`El elemento de id ${id} ha sido eliminado`);
       return this.myArray;
     }
   }

@@ -1,8 +1,6 @@
 import express from "express";
-import handlebars from "express-handlebars";
 import mongoose, { connect } from "mongoose";
 import session from "express-session";
-import MongoStore from "connect-mongo";
 import productRouter from "./routers/products.router.js";
 import cartRouter from "./routers/carts.router.js";
 import viewRouter from "./routers/view.router.js";
@@ -19,12 +17,15 @@ import { handlePolicies } from "./middlewares/handlePolicies.js";
 import config from "./config/config.js";
 import errorHandler from './middlewares/error.js'
 import { CartService } from "./services/index.js";
+import logger from "./utils/logger.js";
+import loggerRouter from "./routers/logger.router.js";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
 app.use(errorHandler)
+//app.use(addLogger)
 
 import exphbs from "express-handlebars";
 const hbs = exphbs.create({
@@ -62,32 +63,31 @@ try {
       dbName: config.mongo.dbname,
     }
   );
-  console.log("DB conected");
+  logger.info("DB conected");
 
-  const httpServer = app.listen(PORT, () => console.log("Server Up!"));
+  const httpServer = app.listen(PORT, () => logger.info("Server Up!"));
   const socketServer = new Server(httpServer);
   
-  app.use("/", sessionViewRouter);
-  app.use("/api/sessions", sessionRouter);
-  app.use("/api/products", productRouter);
-  app.use("/api/carts", handlePolicies(['USER']), cartRouter);
+  app.use("/", sessionViewRouter);// hice logger
+  app.use("/api/sessions", sessionRouter);// hice logger
+  app.use("/api/products", productRouter);// hice logger
+  app.use("/api/carts", handlePolicies(['USER']), cartRouter); // hice logger
   app.use("/products", passportCall('jwt'), viewRouter);
   app.use("/carts", viewRouter);
   app.use("/chat", chatRouter);
   app.use("/mockingproducts", mockRouter);
-
+  app.use('/loggerTest', loggerRouter) 
 
   socketServer.on("connection", (socket) => {
-    console.log(`Nuevo cliente conectado: ${socket.id}`);
+    logger.info(`Nuevo cliente conectado: ${socket.id}`);
     socket.on("productList", (data) => {
       socketServer.emit("updatedProducts", data);
     });
   });
   socketServer.on("connection", (socketCart) => {
-    console.log('socket server 2')
     socketCart.on("productsList", async (cid) => {
       const data = await CartService.getProducts(cid)
-      //console.log('data.products en socketServer' + JSON.stringify(data.products, null, 2))
+      //logger.info('data.products en socketServer' + JSON.stringify(data.products, null, 2))
       socketServer.emit("CartUpdated", data);
     });
   });
@@ -95,14 +95,14 @@ try {
 const messages = [];
 
 socketServer.on("connection", (socketClient) => {
-  console.log(`Nuevo cliente conectado: ${socketClient.id}`);
+  logger.info(`Nuevo cliente conectado: ${socketClient.id}`);
   socketClient.on("message", (data) => {
     messages.push(data);
     socketServer.emit("logs", messages);
   });
 }); 
 } catch (err) {
-  console.log(err.message);
+  logger.error(err.message);
   process.exit(-1);
 }
 

@@ -42,7 +42,6 @@ deleteProduct = (id) => {
     alert("ID del producto no definido. No se puede eliminar.");
     return;
   }
-  console.log(id)
   fetch(`/api/products/${id}`, {
     method: "delete",
   })
@@ -59,7 +58,6 @@ deleteProdFromCart = (pid, cid) => {
     alert("ID del producto no definido. No se puede eliminar.");
     return;
   }
-  console.log(pid + cid)
   fetch(`/api/carts/cid/products/pid`, {
     method: "delete",
   })

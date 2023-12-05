@@ -6,6 +6,7 @@ import usersModel from "../dao/mongoDao/models/usersModel.js";
 import cartsModel from "../dao/mongoDao/models/carts.model.js";
 import passport_jwt from 'passport-jwt';
 import config from "./config.js";
+import logger from "../utils/logger.js";
 
 const localStrategy = local.Strategy;
 const JWTStrategy = passport_jwt.Strategy
@@ -26,7 +27,7 @@ const initializePassport = () => {
             return done(null, false);
           }
           const cartForNewUser = await cartsModel.create({})
-          console.log(cartForNewUser)
+          logger.info(cartForNewUser)
           const newUser = {
             first_name,
             last_name,
@@ -87,7 +88,7 @@ const initializePassport = () => {
     clientSecret: config.github.clientSecret,
     callbackURL: config.github.callbackURL,
   }, async(accessToken, refreshToken, profile, done) => {
-    console.log(profile)
+    logger.info(profile)
     try {
         const user = await usersModel.findOne({ email: profile._json.email })
         if (user){
