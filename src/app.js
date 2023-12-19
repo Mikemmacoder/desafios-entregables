@@ -19,6 +19,8 @@ import errorHandler from './middlewares/error.js'
 import { CartService } from "./services/index.js";
 import logger from "./utils/logger.js";
 import loggerRouter from "./routers/logger.router.js";
+import usersRouter from "./routers/users.router.js";
+import ticketsRouter from "./routers/tickets.router.js"
 
 const app = express();
 app.use(express.json());
@@ -68,10 +70,12 @@ try {
   const httpServer = app.listen(PORT, () => logger.info("Server Up!"));
   const socketServer = new Server(httpServer);
   
-  app.use("/", sessionViewRouter);// hice logger
-  app.use("/api/sessions", sessionRouter);// hice logger
-  app.use("/api/products", productRouter);// hice logger
-  app.use("/api/carts", handlePolicies(['USER']), cartRouter); // hice logger
+  app.use("/", sessionViewRouter);
+  app.use("/api/sessions", sessionRouter);
+  app.use("/api/products", productRouter);
+  app.use("/api/carts", handlePolicies(['USER']), cartRouter); 
+  app.use("/api/tickets", ticketsRouter)
+  app.use("/api/users", usersRouter)
   app.use("/products", passportCall('jwt'), viewRouter);
   app.use("/carts", viewRouter);
   app.use("/chat", chatRouter);

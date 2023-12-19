@@ -1,8 +1,8 @@
 import { Router } from "express";
-const router = Router();
 import { getProductsController, getProductController, createProductController, modifyProductByIdController, deleteProductByIdController } from "../controllers/products.controllers.js";
 import { handlePolicies } from "../middlewares/handlePolicies.js";
 
+const router = Router();
 //import multer from "multer";
 
 /* const storage = multer.diskStorage({
