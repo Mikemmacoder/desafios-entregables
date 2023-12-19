@@ -21,13 +21,14 @@ import logger from "./utils/logger.js";
 import loggerRouter from "./routers/logger.router.js";
 import usersRouter from "./routers/users.router.js";
 import ticketsRouter from "./routers/tickets.router.js"
+import swaggerUiExpress from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
 app.use(errorHandler)
-//app.use(addLogger)
 
 import exphbs from "express-handlebars";
 const hbs = exphbs.create({
@@ -39,7 +40,6 @@ const hbs = exphbs.create({
 });
 
 app.engine("handlebars", hbs.engine);
-
 app.use(
   session({
     secret: "secret",
@@ -50,14 +50,27 @@ app.use(
 app.set("views", "./src/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./src/public"));
-
-
 export const PORT = config.apiserver.port;
 
 initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
-//Mongoose
+
+export const swaggerOptions = {
+  definition: {
+      openapi: '3.1.0',
+      info: {
+          title: 'Ecommerce para Proyecto Final de Coderhouse',
+          version: '1.0.0',
+      }
+  },
+  apis: [
+      `./docs/**/*.yaml`,
+  ],
+};
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
+
 try {
   await mongoose.connect(
     config.mongo.uri,
