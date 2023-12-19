@@ -1,0 +1,197 @@
+paths:
+  /api/products:
+    get:
+      tags: 
+        - Products
+      summary: Get all products
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+    post:
+      tags: 
+        - Products
+      security:
+        - bearerAuth: []
+      summary: Create a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                title:
+                  type: string
+                  required: true
+                description:
+                  type: string
+                  required: true
+                price:
+                  type: number
+                  required: true
+                thumbnails:
+                  type: string
+                code:
+                  type: string
+                stock:
+                  type: number
+                  required: true
+                status:
+                  type: boolean
+                  required: true
+                category:
+                  type: string
+                  required: true
+              required:
+                - title
+                - description
+                - price
+                - code
+                - stock
+                - status
+                - category
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad request. There are missing fields
+        '500':
+          description: Server error
+  /api/products/{productId}:
+    get:
+      tags: 
+        - Products
+      summary: Get a product by ID
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+    put:
+      tags: 
+        - Products
+      summary: Update a product by ID. Write a property with its value
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                thumbnails:
+                  type: string
+                code:
+                  type: string
+                stock:
+                  type: number
+                status:
+                  type: boolean
+                category:
+                  type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+    delete:
+      tags: 
+        - Products
+      summary: Delete a product by ID
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        thumbnails:
+          type: string
+        code:
+          type: string
+        stock:
+          type: number
+        status:
+          type: boolean
+        category:
+          type: string
+      required:
+        - title
+        - description
+        - price
+        - code
+        - stock
+        - status
+        - category
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
