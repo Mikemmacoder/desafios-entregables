@@ -73,6 +73,8 @@ export const addProductToCartController = async (req, res) => {
     try {
         const cid = req.params.cid;
         const pid = req.params.pid;
+        const decodedToken = verifyToken(req.cookies[JWT_COOKIE_NAME]);
+        
         const cartToUpdate = await CartService.getById(cid);
         if (cartToUpdate === null) {
           logger.error(`Cart with id ${cid} Not found`)
@@ -81,11 +83,17 @@ export const addProductToCartController = async (req, res) => {
             .json({ status: "error", error: `Cart with id ${cid} Not found` });
         }
         const productToAdd = await ProductService.getById(pid);
+
         if (productToAdd === null) {
           logger.error(`Product with id ${pid} Not found`)
           return res
             .status(404)
             .json({ status: "error", error: `Product with id ${pid} Not found` });
+        }
+
+        logger.info('decodedToken.user.email: ' + decodedToken.user.email)
+        if (productToAdd.owner === decodedToken.user.email) {
+          return res.status(400).json({ status: 'error', error: 'You cannot buy your own products' })
         }
         const productIndex = cartToUpdate.products.findIndex(
           (item) => item.product == pid

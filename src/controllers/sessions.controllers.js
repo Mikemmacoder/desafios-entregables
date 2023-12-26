@@ -7,7 +7,7 @@ import config from "../config/config.js";
 import { PORT } from "../app.js";
 import UserPasswordModel from "../dao/mongoDao/models/user.password.model.js";
 import nodemailer from 'nodemailer'
-import { createHash } from "../utils/utils.js";
+import { createHash, isValidPassword } from "../utils/utils.js";
 
 //-----controllers de api/sessions----- en session.router
 export const registerController =(req, res) => {
@@ -87,11 +87,16 @@ export const verifyTokenController =async (req, res) => {
 export const resetPasswordController =async (req, res) => {
   try {
       const user = await usersModel.findOne({ email: req.params.user })
-      await usersModel.findByIdAndUpdate(user._id, { password: createHash(req.body.newPassword) })
-      res.json({ status: 'success', message: 'Se ha creado una nueva contraseña' })
+      const newPassword = req.body.newPassword
+      const passRepeated = isValidPassword(user, newPassword)
+      if(passRepeated){
+        return res.json({ status: 'error', error: "La contraseña indicada ya ha sido utilizada" })
+      }
+      await usersModel.findByIdAndUpdate(user._id, { password: createHash(newPassword) })
+      return res.json({ status: 'success', message: 'Se ha creado una nueva contraseña' })
       await UserPasswordModel.deleteOne({ email: req.params.user })
   } catch(err) {
-      res.json({ status: 'error', error: err.message })
+      return res.json({ status: 'error', error: err.message })
   }
 } 
 

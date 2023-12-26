@@ -27,7 +27,7 @@ const createLogger = env => {
         return winston.createLogger({
             levels: customWinstonLevels.levels,
             transports: [
-                new  winston.transports.File({
+                new  winston.transports.Console({
                     filename: 'server.log',
                     level: 'info',
                     format: winston.format.combine(

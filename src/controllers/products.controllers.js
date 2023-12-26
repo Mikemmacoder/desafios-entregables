@@ -4,6 +4,7 @@ import EErros from "../services/errors/enums.js";
 import CustomError from "../services/errors/custom.errors.js";
 import { generateErrorInfo } from "../services/errors/info.js";
 import logger from "../utils/logger.js";
+import { JWT_COOKIE_NAME, verifyToken } from "../utils/utils.js";
 
 //-----controllers de api/products-----
 
@@ -28,7 +29,7 @@ export const getProductController = async (req, res) => {
       }
 }
 export const createProductController =async (req, res) => {
-    try {
+  try {
         const product = req.body;
         if (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.status || !product.category ) {
           logger.error('There are missing fields to create the product.')
@@ -39,6 +40,10 @@ export const createProductController =async (req, res) => {
               code: EErros.INVALID_TYPES_ERROR
           })
         }
+        
+
+        const decodedToken = verifyToken(req.cookies[JWT_COOKIE_NAME]);
+        product.owner = decodedToken.user.email
         const result = await ProductService.create(product);
         logger.info('Product created: ' + product)
         const products = await ProductService.getAll();
@@ -52,6 +57,14 @@ export const modifyProductByIdController =async (req, res) => {
     try {
         const id = req.params.pid;
         const data = req.body;
+        const decodedToken = verifyToken(req.cookies[JWT_COOKIE_NAME]);
+        
+        if (decodedToken.user.role === 'premium'){
+          const product = await ProductService.getById(id)
+            if (product.owner !== decodedToken.user.email) {
+                return res.status(403).json({ status: 'error', error: 'Not Authorized' })
+            }
+        }
         const result = await ProductService.update(id, data, { new: true});
         if (result === null) {
           logger.error('Product not found')
@@ -68,6 +81,17 @@ export const modifyProductByIdController =async (req, res) => {
 export const deleteProductByIdController =async (req, res) => {
     try {
         const id = req.params.pid;
+        const decodedToken = verifyToken(req.cookies[JWT_COOKIE_NAME]);
+        logger.info('decodedToken.user.email: ' + decodedToken.user.email)
+        if (decodedToken.user.role === 'premium'){
+          logger.info('decodedToken.user.role: ' + decodedToken.user.role)
+          
+          const product = await ProductService.getById(id)
+          logger.info('product.owner: ' + product.owner)
+            if (product.owner !== decodedToken.user.email) {
+                return res.status(403).json({ status: 'error', error: 'Not Authorized' })
+            }
+        }
         const result = await ProductService.delete(id);
         if (result === null) {
           logger.error('Product not found')

@@ -5,9 +5,9 @@ import { publicRoutes } from "../middlewares/auth.middleware.js";
 import { handlePolicies } from "../middlewares/handlePolicies.js";
 const router = Router();
 
-router.get("/", publicRoutes, handlePolicies(['USER', 'ADMIN']), homeProductsController);
-router.get("/realTimeProducts", publicRoutes, handlePolicies(['ADMIN']), realTimeProductsController);
-router.get("/:cid", publicRoutes, handlePolicies(['USER']), getProductsFromCartController);
+router.get("/", publicRoutes, handlePolicies(['USER', 'ADMIN', 'PREMIUM']), homeProductsController);
+router.get("/realTimeProducts", publicRoutes, handlePolicies(['ADMIN', 'PREMIUM']), realTimeProductsController);
+router.get("/:cid", publicRoutes, handlePolicies(['USER', 'PREMIUM']), getProductsFromCartController);
 
 /* router.get("/create", async (req, res) => {
   res.render("create", {});

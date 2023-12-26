@@ -15,9 +15,9 @@ const router = Router();
 });
 const upload = multer({ storage }); */
 
-router.get("/", handlePolicies(['USER', 'ADMIN']), getProductsController);
-router.get("/:pid", handlePolicies(['USER', 'ADMIN']), getProductController);
-router.post("/", handlePolicies(['ADMIN']), createProductController);
-router.put("/:pid", handlePolicies(['ADMIN']), modifyProductByIdController);
-router.delete("/:pid", handlePolicies(['ADMIN']), deleteProductByIdController);
+router.get("/", handlePolicies(['USER', 'ADMIN', 'PREMIUM']), getProductsController);
+router.get("/:pid", handlePolicies(['USER', 'ADMIN', 'PREMIUM']), getProductController);
+router.post("/", handlePolicies(['ADMIN', 'PREMIUM']), createProductController);
+router.put("/:pid", handlePolicies(['ADMIN', 'PREMIUM']), modifyProductByIdController);
+router.delete("/:pid", handlePolicies(['ADMIN', 'PREMIUM']), deleteProductByIdController);
 export default router;
