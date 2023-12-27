@@ -86,7 +86,7 @@ try {
   app.use("/", sessionViewRouter);
   app.use("/api/sessions", sessionRouter);
   app.use("/api/products", productRouter);
-  app.use("/api/carts", handlePolicies(['USER']), cartRouter); 
+  app.use("/api/carts", cartRouter); 
   app.use("/api/tickets", ticketsRouter)
   app.use("/api/users", usersRouter)
   app.use("/products", passportCall('jwt'), viewRouter);

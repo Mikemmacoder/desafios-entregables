@@ -72,17 +72,15 @@ paths:
             schema: 
               type: object
               properties:
-                items:
+                products:
                   type: array
-                  items:
-                    type: object
-                    properties:
-                      product:
-                        type: string
-                        format: ObjectId
-                        description: ID of the product to add to the cart
-                      quantity:
-                        type: number
+                  properties:
+                    product:
+                      type: object
+                      format: ObjectId
+                      description: ID of the product to add to the cart
+                    quantity:
+                      type: number
               required:
                 - product ID
                 - quantity
@@ -240,7 +238,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'
+                $ref: '#/components/schemas/CartPurchase'
         '400':
           description: Bad request.
         '404':
@@ -253,26 +251,39 @@ components:
     Cart:
       type: object
       properties:
-        items:
+        _id:
+          type: mongoose.Schema.Types.ObjectId,
+          description: ID of the cart
+        products:
           type: array
           items:
             type: object
             properties:
-              producto:
-                $ref: '#/components/schemas/Product'
-              cantidad:
+              product:
+                type: mongoose.Schema.Types.ObjectId,
+              quantity:
                 type: number
-        user:
-          type: object
-          properties:
-            email:
-              type: string
-        purchase_datetime:
-          type: string
-          format: date-time
-        code:
-          type: string
       required:
         - items
         - purchase_datetime
         - code
+    CartPurchase:
+      type: object
+      properties:
+        code:
+          type: string
+        products:
+          type: array
+        amount:
+          type: number
+        purchaser:
+          type: string
+        _id:
+          type: mongoose.Schema.Types.ObjectId,
+          description: ID of the ticket
+        purchase_datetime:
+          type: string
+        updatedAt:
+          type: string
+        
+

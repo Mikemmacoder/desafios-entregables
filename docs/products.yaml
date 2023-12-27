@@ -40,7 +40,9 @@ paths:
                   type: number
                   required: true
                 thumbnails:
-                  type: string
+                  type: array
+                  items:
+                    type: string
                 code:
                   type: string
                 stock:
@@ -66,7 +68,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/ProductCreated'
         '400':
           description: Bad request. There are missing fields
         '500':
@@ -149,14 +151,16 @@ paths:
           required: true
           description: ID of the product
           schema:
-            type: string
+            type: array
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
         '404':
           description: Not found
         '500':
@@ -166,14 +170,14 @@ components:
     Product:
       type: object
       properties:
+        _id:
+          type: mongoose.Schema.Types.ObjectId,
         title:
           type: string
         description:
           type: string
         price:
           type: number
-        thumbnails:
-          type: string
         code:
           type: string
         stock:
@@ -181,6 +185,8 @@ components:
         status:
           type: boolean
         category:
+          type: string
+        owner:
           type: string
       required:
         - title
@@ -190,6 +196,27 @@ components:
         - stock
         - status
         - category
+    ProductCreated:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          thumbnails:
+            type: array
+        code:
+          type: string
+        stock:
+          type: number
+        status:
+          type: boolean
+        category:
+          type: string
+        _id:
+          type: mongoose.Schema.Types.ObjectId
   securitySchemes:
     bearerAuth:
       type: http
