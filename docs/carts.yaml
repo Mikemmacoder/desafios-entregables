@@ -1,0 +1,289 @@
+paths:
+  /api/carts:
+    post:
+      tags: 
+        - Carts
+      summary: Create a new cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                products:
+                  type: array
+                  properties:
+                    product:
+                      type: mongoose.Schema.Types.ObjectId,
+                      ref: "products"
+                      description: ID of the product to add to the cart
+                    quantity:
+                      type: number
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '500':
+          description: Server error
+  /api/carts/{cartId}:
+    get:
+      tags: 
+        - Carts
+      summary: Get a cart by ID
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          description: ID of the cart
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          description: Unauthorized to access cart
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+    put:
+      tags: 
+        - Carts
+      summary: Update a cart by ID
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          description: ID of the cart
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                products:
+                  type: array
+                  properties:
+                    product:
+                      type: object
+                      format: ObjectId
+                      description: ID of the product to add to the cart
+                    quantity:
+                      type: number
+              required:
+                - product ID
+                - quantity
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request. There are missing fields
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+    delete:
+      tags: 
+        - Carts
+      summary: Delete a cart by ID
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          description: ID of the cart
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+  /api/carts/{cartId}/products/{productId}:
+    delete:
+      tags: 
+        - Carts
+      summary: Delete an item from the cart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          description: ID of the cart
+          schema:
+            type: string
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+    post:
+      tags: 
+        - Carts
+      summary: Add a product in a specific cart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          description: ID of the cart
+          schema:
+            type: string
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product to add
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+    put:
+      tags: 
+        - Carts
+      summary: Update a product quantity from a specific cart by ID
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          description: ID of the cart
+          schema:
+            type: string
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                quantity:
+                  type: number
+              required:
+                - product ID
+                - cart ID
+                - quantity
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request. There are missing fields
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+
+  /api/carts/{cartId}/purchase:
+    get:
+      tags: 
+        - Carts
+      summary: Purchase products in cart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          description: ID of the cart
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartPurchase'
+        '400':
+          description: Bad request.
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: mongoose.Schema.Types.ObjectId,
+          description: ID of the cart
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: mongoose.Schema.Types.ObjectId,
+              quantity:
+                type: number
+      required:
+        - items
+        - purchase_datetime
+        - code
+    CartPurchase:
+      type: object
+      properties:
+        code:
+          type: string
+        products:
+          type: array
+        amount:
+          type: number
+        purchaser:
+          type: string
+        _id:
+          type: mongoose.Schema.Types.ObjectId,
+          description: ID of the ticket
+        purchase_datetime:
+          type: string
+        updatedAt:
+          type: string
+        
+
