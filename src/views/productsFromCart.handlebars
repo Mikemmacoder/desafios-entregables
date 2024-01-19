@@ -114,29 +114,32 @@ const decrementProdQuantity = (pid, quantity) => {
     });
 };
 
-const finalizePurchase = () => {
+const finalizePurchase = (req, res) => {
   const cid = {{{json cart._id}}};
   fetch(`/api/carts/${cid}/purchase`, { 
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     }
   })
     .then(response => {
+      console.log(response)
+      console.log('response en prodFromCart: ' + JSON.stringify(response, null, 2))
       if (!response.ok) {
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }
-      return response.json();
+      return response.json(); 
     })
     .then(result => { 
       socketCart.emit('productsList', cid);
-      alert('Compra finalizada con éxito');
+      console.log('result en prodFromCart: ' + JSON.stringify(result, null, 2))
+      const {code,amount, purchaser, purchase_datetime} = result.payload
+      alert(`Compra finalizada con éxito\n Comprador: ${purchaser} \n Código de compra: ${code}\n Fecha de compra: ${purchase_datetime}\n Total: $${amount}`);
+      
       //TODO: REDIRECCIONAR A VISTA CON LOS PRODUCTOS COMPRADOS
       //MOSTRAR MONTO TOTAL
       //ENVIAR MAIL
     })
-    .catch(error => {
-      alert('Ocurrió un error:', error);
-    });
 };
 
 /////----------Socket----------/////

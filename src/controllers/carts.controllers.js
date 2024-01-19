@@ -6,6 +6,7 @@ import usersModel from "../dao/mongoDao/models/usersModel.js";
 import { JWT_COOKIE_NAME } from "../utils/utils.js";
 import { verifyToken } from "../utils/utils.js";
 import logger from "../utils/logger.js";
+import { sendEmail } from "../utils/utils.js";
 
 //-----controllers de api/carts-----
 /* export const getProductsFromCart = async (req, res) => {
@@ -322,20 +323,20 @@ export const purchaseController = async(req, res) => {
               return res.status(400).json({ status: 'error', error: `Product with id=${cartToPurchase.products[index].product} does not exist. We cannot purchase this product` })
           }
           if (cartToPurchase.products[index].quantity <= productToPurchase.stock) {
-              //actualizamos el stock del producto que se está comprando
+//------------actualizamos el stock del producto que se está comprando
               productToPurchase.stock -= cartToPurchase.products[index].quantity
               await ProductService.update(productToPurchase._id, { stock: productToPurchase.stock })
-              //eliminamos (del carrito) los productos que se han comparado (en memoria)
+//------------eliminamos (del carrito) los productos que se han comparado (en memoria)
               productsAfterPurchase = productsAfterPurchase.filter(item => item.product.toString() !== cartToPurchase.products[index].product.toString())
-              //calculamos el amount (total del ticket)
+//------------calculamos el amount (total del ticket)
               amount += (productToPurchase.price * cartToPurchase.products[index].quantity)
-              //colocamos el producto en el Ticket (en memoria)
+//------------colocamos el producto en el Ticket (en memoria)
               productsToTicket.push({ product: productToPurchase._id, price: productToPurchase.price, quantity: cartToPurchase.products[index].quantity})
           }
       }
-      //eliminamos (del carrito) los productos que se han comparado
+//----eliminamos (del carrito) los productos que se han comparado
       await CartService.update(cid, { products: productsAfterPurchase }, { returnDocument: 'after' })
-      //creamos el Ticket
+//----creamos el Ticket
       const user = await usersModel.findOne({ cart: cartToPurchase });
       const result = await TicketService.create({
           code: shortid.generate(),
@@ -344,8 +345,22 @@ export const purchaseController = async(req, res) => {
           purchaser: user.email
       })
       logger.info('ticket: ' + result)
+      console.log('pasó por el cart-controller')
+//----Enviar email
+      const productsNames = result.products.map(p => p.product);
+      const subject = '[Ethereal] Compra confirmada';
+      const htmlMessage = `<h1>Tu compra en Ethereal ha sido exitosa!!!</h1><br/><p>Detalles</p><br/>Comprador: ${result.purchaser}<br/>Código de compra: ${result.code}<br/>Fecha de compra: ${result.purchase_datetime}<br/><strong>Total: $${result.amount}</strong><br/><br/>Saludos,<br><strong>El equipo de Ethereal</strong>`
+      sendEmail(result.purchaser, subject, htmlMessage)
       return res.status(201).send({ status: 'success', payload: result })
   } catch(err) {
       return res.status(500).json({ status: 'error', error: err.message })
   }
 }
+
+export const chekoutController = async(req, res) => {
+  logger.info('req: ' + req)
+  logger.info('res: ' + res)
+  return res.render('checkout')
+
+}
+

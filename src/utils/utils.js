@@ -10,6 +10,7 @@ import jwt  from "jsonwebtoken";
 import handlebars from 'handlebars';
 import config from "../config/config.js";
 import { faker } from '@faker-js/faker';
+import nodemailer from 'nodemailer'
 
 export const createHash = (password) =>
   bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -73,3 +74,23 @@ export const generateRandomString = (num) => {
       .join('')
       .toUpperCase();
 }
+
+export const sendEmail = async (email, subject, htmlMessage) => {
+  const mailerConfig = {
+    service: 'gmail',
+    auth: { user: config.nodemailer.user, pass: config.nodemailer.pass } 
+  }
+  let transporter = nodemailer.createTransport(mailerConfig)
+  let message = {
+    from: config.nodemailer.user,
+    to: email, 
+    subject: subject,
+    html: htmlMessage
+  }
+  try {
+    await transporter.sendMail(message)
+    return `Email successfully sent to ${email}`
+  } catch (err) {
+    return('Ocurrió un error: ' + err)
+  }
+} 

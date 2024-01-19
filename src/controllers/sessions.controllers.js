@@ -6,8 +6,8 @@ import { generateRandomString } from "../utils/utils.js";
 import config from "../config/config.js";
 import { PORT } from "../app.js";
 import UserPasswordModel from "../dao/mongoDao/models/user.password.model.js";
-import nodemailer from 'nodemailer'
 import { createHash, isValidPassword } from "../utils/utils.js";
+import { sendEmail } from "../utils/utils.js";
 
 //-----controllers de api/sessions----- en session.router
 export const registerController =(req, res) => {
@@ -58,23 +58,14 @@ export const forgetPasswordController =async (req, res) => {
     }
     const token = generateRandomString(16);
     await UserPasswordModel.create({ email, token }) 
-    const mailerConfig = {
-        service: 'gmail',
-        auth: { user: config.nodemailer.user, pass: config.nodemailer.pass } 
-    }
-    let transporter = nodemailer.createTransport(mailerConfig)
-    let message = {
-        from: config.nodemailer.user,
-        to: email, 
-        subject: '[Coder e-comm API] Reset your password',
-        html: `<h1>[Coder e-comm API] Reset your password</h1><hr />You have asked to reset your password. You can do it here: <a href="http://${req.hostname}:${PORT}/reset-password/${token}">http://${req.hostname}:${PORT}/reset-password/${token}</a><hr />Best regards,<br><strong>The Coder e-comm API team</strong>`
-    }
     try {
-        await transporter.sendMail(message)
-        res.json({ status: 'success', message: `Email successfully sent to ${email} in order to reset password` })
+      const subject = '[Coder e-comm API] Reset your password'
+      const htmlMessage =`<h1>[Coder e-comm API] Reset your password</h1><hr />You have asked to reset your password. You can do it here: <a href="http://${req.hostname}:${PORT}/reset-password/${token}">http://${req.hostname}:${PORT}/reset-password/${token}</a><hr />Best regards,<br><strong>The Coder e-comm API team</strong>`
+      sendEmail(email, subject, htmlMessage)
+      res.json({ status: 'success', message: `Email successfully sent to ${email} in order to reset password` })
     } catch (err) {
-        res.status(500).json({ status: 'error', error: err.message })
-    }
+      res.status(500).json({ status: 'error', error: err.message })
+    } 
 } 
 export const verifyTokenController =async (req, res) => {
   const userPassword = await UserPasswordModel.findOne({ token: req.params.token })
@@ -93,8 +84,8 @@ export const resetPasswordController =async (req, res) => {
         return res.json({ status: 'error', error: "La contraseña indicada ya ha sido utilizada" })
       }
       await usersModel.findByIdAndUpdate(user._id, { password: createHash(newPassword) })
-      return res.json({ status: 'success', message: 'Se ha creado una nueva contraseña' })
       await UserPasswordModel.deleteOne({ email: req.params.user })
+      return res.json({ status: 'success', message: 'Se ha creado una nueva contraseña' })
   } catch(err) {
       return res.json({ status: 'error', error: err.message })
   }
