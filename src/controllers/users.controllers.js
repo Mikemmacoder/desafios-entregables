@@ -1,6 +1,7 @@
 import { UserService } from "../services/index.js";
 import usersModel from "../dao/mongoDao/models/usersModel.js";
 import ShortUsersDTO from "../dto/short.user.dto.js";
+import { sendEmail } from "../utils/utils.js";
 
 export const get = async (req, res) => {
     const users = await UserService.getAll()
@@ -16,10 +17,16 @@ export const deleteByLastConnection = async (req, res) => {
     try {
         const currentDate = new Date();
         const twoDaysAgo = new Date();
-        // Setea la fecha de ahora restandole un 2 al día 23
+        // Setea la fecha de ahora restandole un 2 al día 
         twoDaysAgo.setDate(currentDate.getDate() - 2); // En lugar de 2024-01-23T14:30:10.636Z => 2024-01-21T14:30:10.636Z
-        const result = await usersModel.deleteMany({ last_connection: { $lt: varprueba } });
+        const usersToDelete = await usersModel.find({last_connection: { $lt: twoDaysAgo} })
+        const result = await usersModel.deleteMany({ last_connection: { $lt: twoDaysAgo} });
         // result devuelve:  { acknowledged: true, deletedCount: 1 }
+        usersToDelete.forEach((user) =>{
+            const subject = '[Ethereal] Cuenta eliminada';
+            const htmlMessage = `<h1>Tu cuenta en Ethereal ha sido eliminada por inactividad!!!</h1><br/><br/>Saludos,<br><strong>El equipo de Ethereal</strong>`
+            sendEmail(user.email, subject, htmlMessage)
+        })
         res.json({ message: `${result.deletedCount} usuarios eliminados correctamente.` });
     } catch (error) {
         console.error(error);
