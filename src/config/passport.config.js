@@ -3,6 +3,7 @@ import local from "passport-local";
 import GitHubStrategy from "passport-github2"
 import { createHash, isValidPassword, JWT_PRIVATE_KEY, extractCookie, generateToken } from "../utils/utils.js";
 import usersModel from "../dao/mongoDao/models/usersModel.js";
+import { UserService } from "../services/index.js";
 import cartsModel from "../dao/mongoDao/models/carts.model.js";
 import passport_jwt from 'passport-jwt';
 import config from "./config.js";
@@ -71,8 +72,10 @@ const initializePassport = () => {
             return done(null, user);
           }
           const user = await usersModel.findOne({ email: username });
+          const data = { last_connection: new Date() }
+          await UserService.update(user._id, data);
+
           if (!isValidPassword(user, password) || !user) return done(null, false);
-          
           const token = generateToken(user)
           user.token = token
 
