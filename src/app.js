@@ -8,6 +8,7 @@ import sessionViewRouter from "./routers/sessionViewRouter.js";
 import sessionRouter from "./routers/sessionRouter.js";
 import chatRouter from './routers/chat.router.js'
 import mockRouter from './routers/mock.router.js'
+import viewUsersRouter from './routers/view.users.router.js'
 import { Server } from "socket.io";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -16,7 +17,7 @@ import cookieParser from "cookie-parser";
 import { handlePolicies } from "./middlewares/handlePolicies.js";
 import config from "./config/config.js";
 import errorHandler from './middlewares/error.js'
-import { CartService } from "./services/index.js";
+import { CartService, UserService } from "./services/index.js";
 import logger from "./utils/logger.js";
 import loggerRouter from "./routers/logger.router.js";
 import usersRouter from "./routers/users.router.js";
@@ -91,6 +92,7 @@ try {
   app.use("/api/users", usersRouter)
   app.use("/products", passportCall('jwt'), viewRouter);
   app.use("/carts", viewRouter);
+  app.use("/users", viewUsersRouter);
   app.use("/chat", chatRouter);
   app.use("/mockingproducts", mockRouter);
   app.use('/loggerTest', loggerRouter) 
@@ -109,15 +111,23 @@ try {
     });
   });
   
-const messages = [];
+  const messages = [];
 
-socketServer.on("connection", (socketClient) => {
-  logger.info(`Nuevo cliente conectado: ${socketClient.id}`);
-  socketClient.on("message", (data) => {
-    messages.push(data);
-    socketServer.emit("logs", messages);
+  socketServer.on("connection", (socketClient) => {
+    logger.info(`Nuevo cliente conectado: ${socketClient.id}`);
+    socketClient.on("message", (data) => {
+      messages.push(data);
+      socketServer.emit("logs", messages);
+    });
   });
-}); 
+  
+  socketServer.on("connection", (socketUser) => {
+    logger.info(`Nuevo cliente conectado. Socket User: ${socketUser.id}`);
+    socketUser.on("usersUpdated", async () => {
+      const users = await UserService.getAll()
+      socketServer.emit("users", users);
+    });
+  });
 } catch (err) {
   logger.error(err.message);
   process.exit(-1);

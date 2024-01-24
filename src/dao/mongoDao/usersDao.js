@@ -5,4 +5,5 @@ export default class UserMongoDAO {
     getById = async(id) => await usersModel.findById(id).lean().exec();
     create = async(data) => await usersModel.create(data)
     update = async(id, data) => await usersModel.updateOne({_id: id}, data)
+    delete = async(id) => await usersModel.deleteOne({_id: id})
 }

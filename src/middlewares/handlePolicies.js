@@ -9,7 +9,7 @@ export const handlePolicies = (policies) => (req, res, next) => {
     try {
       const decodedToken = verifyToken(token);
       if (!policies.includes(decodedToken.user.role.toUpperCase())) {
-        return res.status(403).render('errors/base', { error: 'Forbidden token mikita' });
+        return res.status(403).render('errors/base', { error: 'Forbidden token ' });
       }
       next();
     } catch (error) {
