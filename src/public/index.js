@@ -1,6 +1,7 @@
 const socket = io();
 const table = document.getElementById("realProductsTable");
 document.getElementById("createBtn").addEventListener("click", () => {
+  event.preventDefault()
   const body = {
     title: document.getElementById("title").value,
     description: document.getElementById("description").value,
@@ -17,11 +18,6 @@ document.getElementById("createBtn").addEventListener("click", () => {
       "Content-Type": "application/json",
     },
   })
-    .then((result) => result.json())
-    .then((result) => {
-      if (result.status === "error") throw new Error(result.error);
-    })
-    .then(() => fetch("/api/products"))
     .then((result) => result.json())
     .then((result) => {
       if (result.status === "error") throw new Error(result.error);

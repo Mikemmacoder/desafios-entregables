@@ -5,7 +5,8 @@ import CustomError from "../services/errors/custom.errors.js";
 import { generateErrorInfo } from "../services/errors/info.js";
 import logger from "../utils/logger.js";
 import { JWT_COOKIE_NAME, verifyToken } from "../utils/utils.js";
-
+import { sendEmail } from "../utils/utils.js";
+import config from "../config/config.js";
 //-----controllers de api/products-----
 
 export const getProductsController = async (req, res) => {
@@ -40,14 +41,12 @@ export const createProductController =async (req, res) => {
               code: EErros.INVALID_TYPES_ERROR
           })
         }
-        
-
         const decodedToken = verifyToken(req.cookies[JWT_COOKIE_NAME]);
         product.owner = decodedToken.user.email
         const result = await ProductService.create(product);
-        logger.info('Product created: ' + product)
+        logger.info(`Product '${product.title}' created by ${product.owner}`)
         const products = await ProductService.getAll();
-        res.status(201).json({ status: "success", payload: result });
+        res.status(201).json({ status: "success", payload: products });
       } catch (err) {
         logger.error(err.message)
         res.status(500).json({ status: "error", error: err.message });
@@ -82,23 +81,26 @@ export const deleteProductByIdController =async (req, res) => {
     try {
         const id = req.params.pid;
         const decodedToken = verifyToken(req.cookies[JWT_COOKIE_NAME]);
-        logger.info('decodedToken.user.email: ' + decodedToken.user.email)
+        const product = await ProductService.getById(id)
         if (decodedToken.user.role === 'premium'){
           logger.info('decodedToken.user.role: ' + decodedToken.user.role)
-          
-          const product = await ProductService.getById(id)
           logger.info('product.owner: ' + product.owner)
-            if (product.owner !== decodedToken.user.email) {
-                return res.status(403).json({ status: 'error', error: 'Not Authorized' })
-            }
+          if (product.owner !== decodedToken.user.email) {
+            return res.status(403).json({ status: 'error', error: 'Not Authorized' })
+          }
         }
         const result = await ProductService.delete(id);
         if (result === null) {
           logger.error('Product not found')
           return res.status(404).json({ status: "error", error: "Not found" });
         }
+        logger.info(`${decodedToken.user.email} ha eliminado el producto ${product.title} `)
+        if (product.owner !== config.admin.email){
+          const subject = '[Ethereal] Producto eliminado';
+          const htmlMessage = `<h1>Tu producto ha sido eliminado!!!</h1><br/><p>El producto ${product.title} ha sido eliminado</p><br/><br/>Saludos,<br><strong>El equipo de Ethereal</strong>`
+          sendEmail(product.owner, subject, htmlMessage)
+        }
         const products = await ProductService.getAll();
-        logger.info('Product deleted')
         res.status(200).json({ status: "success", payload: products });
       } catch (err) {
         logger.error(err.message)

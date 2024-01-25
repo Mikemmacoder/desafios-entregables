@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import config from "../../../config/config.js";
 
 const productsSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -10,7 +11,7 @@ const productsSchema = new mongoose.Schema({
   stock: { type: Number, required: true },
   status: { type: Boolean, required: true },
   category: { type: String, required: true },
-  owner: { type: String, required: true, default: 'admin', ref: "users" }
+  owner: { type: String, required: true, default: config.admin.email, ref: "users" }
 });
 
 mongoose.set("strictQuery", false);
