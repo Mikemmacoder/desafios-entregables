@@ -25,9 +25,9 @@
           <td>{{this.product.price}}</td>
           <td>{{this.product.code}}</td>
           <td>{{this.product.stock}}</td>
-          <td><button id="btnRest" onclick="decrementProdQuantity('{{this.product._id}}', '{{this.quantity}}')">-</button>
+          <td><button id="btnRest" onclick="decrementProdQuantity('{{this.product._id}}', {{this.quantity}})">-</button>
           {{this.quantity}}
-          <button id="btnAdd" onclick="incrementProductQuantity('{{this.product._id}}', '{{this.quantity}}', '{{this.product.stock}}')">+</button></td>
+          <button id="btnAdd" onclick="incrementProductQuantity('{{this.product._id}}', {{this.quantity}}, {{this.product.stock}})">+</button></td>
           <td><button id="btnDelelte" onclick="deleteProdFromCart('{{this.product._id}}')">Eliminar</button></td>
         </tr>
       {{/each}}
@@ -153,9 +153,9 @@ const updateCartView = (data) => {
       <td>${product.product.code}</td>
       <td>${product.product.stock}</td>
       <td>
-        <button id="btnRest" onclick="decrementProdQuantity('${product.product._id}', '${product.quantity}')">-</button>
+        <button id="btnRest" onclick="decrementProdQuantity('${product.product._id}', ${product.quantity})">-</button>
           ${product.quantity}
-          <button id="btnAdd" onclick="incrementProductQuantity('${product.product._id}', '${product.quantity}', '${product.product.stock}')">+</button></td>
+          <button id="btnAdd" onclick="incrementProductQuantity('${product.product._id}', ${product.quantity}, ${product.product.stock})">+</button></td>
           <td><button id="btnDelelte" onclick="deleteProdFromCart('${product.product._id}')">Eliminar</button></td>
     `
     table.appendChild(row);

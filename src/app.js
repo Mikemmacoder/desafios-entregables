@@ -24,6 +24,7 @@ import usersRouter from "./routers/users.router.js";
 import ticketsRouter from "./routers/tickets.router.js"
 import swaggerUiExpress from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import { program} from "./config/config.js";
 
 const app = express();
 app.use(express.json());
@@ -51,7 +52,7 @@ app.use(
 app.set("views", "./src/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./src/public"));
-export const PORT = config.apiserver.port;
+export const PORT = program.opts().p 
 
 initializePassport();
 app.use(passport.initialize());
@@ -79,9 +80,9 @@ try {
       dbName: config.mongo.dbname,
     }
   );
-  logger.info("DB conected");
+  logger.info(`DB conected: ${config.mongo.dbname}`);
 
-  const httpServer = app.listen(PORT, () => logger.info("Server Up!"));
+  const httpServer = app.listen(PORT, () => logger.info(`Server Up on port: ${PORT}`));
   const socketServer = new Server(httpServer);
   
   app.use("/", sessionViewRouter);
@@ -106,7 +107,7 @@ try {
   socketServer.on("connection", (socketCart) => {
     socketCart.on("productsList", async (cid) => {
       const data = await CartService.getProducts(cid)
-      //logger.info('data.products en socketServer' + JSON.stringify(data.products, null, 2))
+      //logger.info('data en socketServer' + JSON.stringify(data, null, 2))
       socketServer.emit("CartUpdated", data);
     });
   });

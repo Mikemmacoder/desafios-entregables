@@ -345,7 +345,6 @@ export const purchaseController = async(req, res) => {
           purchaser: user.email
       })
       logger.info('ticket: ' + result)
-      console.log('pasó por el cart-controller')
 //----Enviar email
       const subject = '[Ethereal] Compra confirmada';
       const htmlMessage = `<h1>Tu compra en Ethereal ha sido exitosa!!!</h1><br/><p>Detalles</p><br/>Comprador: ${result.purchaser}<br/>Código de compra: ${result.code}<br/>Fecha de compra: ${result.purchase_datetime}<br/><strong>Total: $${result.amount}</strong><br/><br/>Saludos,<br><strong>El equipo de Ethereal</strong>`

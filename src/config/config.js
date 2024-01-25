@@ -1,5 +1,16 @@
 import dotenv from 'dotenv';
-dotenv.config()
+import { Command } from "commander";
+
+export const program = new Command()
+program
+  .option('-p <port>', 'Puerto del servidor', 8080) 
+  .option('--mode <mode>', 'Modo de ejecución', 'development')
+program.parse()
+
+export const environment = program.opts().mode
+dotenv.config({
+    path: environment === 'production' ? './.env.production' : './.env.development' 
+})
 
 export default {
     apiserver: {

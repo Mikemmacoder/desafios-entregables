@@ -1,4 +1,3 @@
-import { PORT } from "../app.js"
 export default class ProductRepository {
     constructor(dao) {
         this.dao = dao
