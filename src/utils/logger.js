@@ -1,5 +1,6 @@
 import winston from "winston"
 import dotenv from 'dotenv'
+import { environment } from "../config/config.js"
 dotenv.config()
 
 const customWinstonLevels = {
@@ -23,12 +24,11 @@ const customWinstonLevels = {
 winston.addColors(customWinstonLevels.colors)
 
 const createLogger = env => {
-    if (env === 'PROD') {
+    if (env === 'production') {
         return winston.createLogger({
             levels: customWinstonLevels.levels,
             transports: [
                 new  winston.transports.Console({
-                    filename: 'server.log',
                     level: 'info',
                     format: winston.format.combine(
                         winston.format.timestamp(),
@@ -64,6 +64,6 @@ const createLogger = env => {
     }
 }
 
-const logger = createLogger(process.env.ENVIRONMENT)
+const logger = createLogger(environment)
 
 export default logger

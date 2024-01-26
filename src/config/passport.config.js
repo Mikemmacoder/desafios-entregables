@@ -2,9 +2,7 @@ import passport from "passport";
 import local from "passport-local";
 import GitHubStrategy from "passport-github2"
 import { createHash, isValidPassword, JWT_PRIVATE_KEY, extractCookie, generateToken } from "../utils/utils.js";
-import usersModel from "../dao/mongoDao/models/usersModel.js";
-import { UserService } from "../services/index.js";
-import cartsModel from "../dao/mongoDao/models/carts.model.js";
+import { CartService, UserService } from "../services/index.js";
 import passport_jwt from 'passport-jwt';
 import config from "./config.js";
 import logger from "../utils/logger.js";
@@ -23,11 +21,11 @@ const initializePassport = () => {
       async (req, username, password, done) => {
         const { first_name, last_name, email, age, role } = req.body;
         try {
-          const user = await usersModel.findOne({ email: username });
+          const user = await UserService.getByData({ email: username });
           if (user) {
             return done(null, false);
           }
-          const cartForNewUser = await cartsModel.create({})
+          const cartForNewUser = await CartService.create()
           logger.info(cartForNewUser)
           const newUser = {
             first_name,
@@ -38,7 +36,9 @@ const initializePassport = () => {
             role: role || "user",
             cart: cartForNewUser
           };
-          const result = await usersModel.create(newUser);
+          console.log('user: ' + newUser)
+          console.log('user: ' + JSON.stringify(newUser, null, 2))
+          const result = await UserService.create(newUser);
           return done(null, result );
         } catch (err) {
           return done(err);
@@ -56,7 +56,7 @@ const initializePassport = () => {
       async (username, password, done) => {
         try {
           if (username === config.admin.email && password === config.admin.password) {
-            const cartForAdmin = await cartsModel.findOne({ _id: '6536fce65e2cb6f12d2819f2'});
+            const cartForAdmin = await CartService.getById({ _id: '6536fce65e2cb6f12d2819f2'});
             const user = {
               _id: "admin",
               email: config.admin.email,
@@ -71,7 +71,7 @@ const initializePassport = () => {
             user.token = tokenAdmin
             return done(null, user);
           }
-          const user = await usersModel.findOne({ email: username });
+          const user = await UserService.getByData({ email: username });
           const data = { last_connection: new Date() }
           await UserService.update(user._id, data);
 
@@ -85,7 +85,6 @@ const initializePassport = () => {
     )
   );
 
- 
   passport.use('github', new GitHubStrategy({
     clientID: config.github.clientID,
     clientSecret: config.github.clientSecret,
@@ -93,19 +92,17 @@ const initializePassport = () => {
   }, async(accessToken, refreshToken, profile, done) => {
     logger.info(profile)
     try {
-        const user = await usersModel.findOne({ email: profile._json.email })
+        const user = await UserService.getByData({ email: profile._json.email })
         if (user){
           const token = generateToken(user)
           user.token = token
           return done(null, user)
         }
-         
-        const newUser = await usersModel.create({
+        const newUser = await UserService.create({
             first_name: profile._json.name,
             last_name: '',
             email: profile._json.email,
             password: '', 
-            // role: 'user' 
         })
         const token = generateToken(newUser)
         newUser.token = token
@@ -134,7 +131,7 @@ passport.use('jwt', new JWTStrategy({
 
   passport.deserializeUser(async (id, done) => {
     if (id === "admin"){
-      const cartForAdmin = await cartsModel.findById('6536fce65e2cb6f12d2819f2');
+      const cartForAdmin = await CartService.getById('6536fce65e2cb6f12d2819f2');
       const user = {
         _id: "admin",
         email: config.admin.email,
@@ -147,7 +144,7 @@ passport.use('jwt', new JWTStrategy({
       };
       done(null, user); 
     } else{
-      const user = await usersModel.findById(id);
+      const user = await UserService.getById(id);
       done(null, user);
     }
     

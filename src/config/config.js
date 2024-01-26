@@ -11,7 +11,6 @@ export const environment = program.opts().mode
 dotenv.config({
     path: environment === 'production' ? './.env.production' : './.env.development' 
 })
-
 export default {
     apiserver: {
         port: process.env.PORT
@@ -37,5 +36,6 @@ export default {
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
         callbackURL: process.env.GITHUB_CALLBACK_URL 
     },
+    environment: program.opts().mode,
     persistence: process.env.PERSISTENCE || "FILE"
 }

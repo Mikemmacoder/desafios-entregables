@@ -1,9 +1,7 @@
-import { UserService } from "../services/index.js";
-import usersModel from "../dao/mongoDao/models/usersModel.js";
+import { CartService, UserService } from "../services/index.js";
 import ShortUsersDTO from "../dto/short.user.dto.js";
 import { sendEmail } from "../utils/utils.js";
 import logger from "../utils/logger.js";
-import cartsModel from "../dao/mongoDao/models/carts.model.js";
 import { generateRandomString } from "../utils/utils.js";
 import { createHash } from "../utils/utils.js";
 
@@ -16,12 +14,11 @@ export const get = async (req, res) => {
 export const create = async (req, res) => {
     try {
         const {email} = req.body
-        const usr = await usersModel.findOne({ email });
+        const usr = await UserService.getByData({ email });
         if (usr) {
             throw new Error('User already exists');
-        }
-        
-        const cartForNewUser = await cartsModel.create({}) 
+        } 
+        const cartForNewUser = await CartService.create() 
         const user = {
             ...req.body, 
             password: createHash(generateRandomString(16)),
@@ -42,10 +39,12 @@ export const deleteByLastConnection = async (req, res) => {
     try {
         const currentDate = new Date();
         const twoDaysAgo = new Date();
-        // Setea la fecha de ahora restandole un 2 al día 
-        twoDaysAgo.setDate(currentDate.getDate() - 2); // En lugar de 2024-01-23T14:30:10.636Z => 2024-01-21T14:30:10.636Z
-        const usersToDelete = await usersModel.find({last_connection: { $lt: twoDaysAgo} })
-        const result = await usersModel.deleteMany({ last_connection: { $lt: twoDaysAgo} });
+        twoDaysAgo.setDate(currentDate.getDate() - 2); //Setea la fecha de ahora restandole un 2 al día. En lugar de 2024-01-23T14:30:10.636Z => 2024-01-21T14:30:10.636Z
+        const thirtyMinutesAgo = new Date();
+        thirtyMinutesAgo.setTime(currentDate.getTime() - 30 * 60 * 1000); //calcula el equivalente en milisegundos de 30' minutos'. Luego, se resta ese valor al tiempo actual
+
+        const usersToDelete = await UserService.getAllByData({last_connection: { $lt: thirtyMinutesAgo} }) //Colocar aquí la variable según el tiempo deseado
+        const result = await UserService.deleteMany({ last_connection: { $lt: thirtyMinutesAgo} });//Colocar aquí la variable según el tiempo deseado
         // result devuelve:  { acknowledged: true, deletedCount: 1 }
         usersToDelete.forEach((user) =>{
             const subject = '[Ethereal] Cuenta eliminada';

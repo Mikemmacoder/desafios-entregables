@@ -1,35 +1,13 @@
-import { CartService } from "../services/index.js";
+import { CartService, UserService } from "../services/index.js";
 import { ProductService } from "../services/index.js";
 import { TicketService } from "../services/index.js";
 import shortid from "shortid";
-import usersModel from "../dao/mongoDao/models/usersModel.js";
 import { JWT_COOKIE_NAME } from "../utils/utils.js";
 import { verifyToken } from "../utils/utils.js";
 import logger from "../utils/logger.js";
 import { sendEmail } from "../utils/utils.js";
 
 //-----controllers de api/carts-----
-/* export const getProductsFromCart = async (req, res) => {
-    try {
-      const id = req.params.cid;
-      const result = await getProducts(id)
-      if (result === null) {
-        return {
-          statusCode: 404,
-          response: { status: "error", error: "Not found" },
-        };
-      }
-      return {
-        statusCode: 200,
-        response: { status: "succes", payload: result },
-      };
-    } catch (err) {
-      return {
-        statusCode: 500,
-        response: { status: "error", error: err.message },
-      };
-    }
-  }; */
 export const createCartController = async (req, res) => {
     try {
         const cartToAdd = await CartService.create();
@@ -337,7 +315,7 @@ export const purchaseController = async(req, res) => {
 //----eliminamos (del carrito) los productos que se han comparado
       await CartService.update(cid, { products: productsAfterPurchase }, { returnDocument: 'after' })
 //----creamos el Ticket
-      const user = await usersModel.findOne({ cart: cartToPurchase });
+      const user = await UserService.getByData({ cart: cartToPurchase })
       const result = await TicketService.create({
           code: shortid.generate(),
           products: productsToTicket,
