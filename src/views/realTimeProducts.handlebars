@@ -26,6 +26,18 @@
   <h2>
     Products
   </h2>
+    <div>
+    {{#if paginateInfo.hasPrevPage}}
+      <a href="{{paginateInfo.prevLink}}">Anterior</a>
+    {{/if}}
+    {{#each paginateInfo.totalPages}}
+      <a href="{{this.link}}">{{this.page}}</a>
+    {{/each}}
+    {{#if paginateInfo.hasNextPage}}
+      <a href="{{paginateInfo.nextLink}}">Siguiente</a>
+    {{/if}}
+
+  </div>
   <table id="realProductsTable">
     <thead>
       <tr>

@@ -6,7 +6,9 @@ export default class ProductMongoDAO {
     getById = async(id) => await productsModel.findById(id).lean().exec();
     getAllPaginate = async(req, options) => {
       try {
-        const limit = parseInt(req.query.limit) || 10;
+        //const limit = parseInt(req.query.limit) || 10;
+        const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+
         const page = parseInt(req.query.page) || 1;
         const paginateOptions = { lean: true, limit, page };
     
@@ -16,7 +18,7 @@ export default class ProductMongoDAO {
         if (req.query.sort === "asc") paginateOptions.sort = { price: 1 };
         if (req.query.sort === "desc") paginateOptions.sort = { price: -1 };
         const result = await productsModel.paginate(filterOptions, paginateOptions);
-    
+
         let prevLink;
         if (!req.query.page) {
           prevLink = `http://${req.hostname}:${PORT}${req.originalUrl}&page=${result.prevPage}`;
@@ -29,7 +31,7 @@ export default class ProductMongoDAO {
         }
         let nextLink;
         if (!req.query.page) {
-          nextLink = `http://${req.hostname}:${PORT}${req.originalUrl}&page=${result.nextPage}`;
+          nextLink = `http://${req.hostname}:${PORT}${req.originalUrl}${req.originalUrl.includes('?') ? '&' : '?'}page=${result.nextPage}`;
         } else {
           const modifiedUrl = req.originalUrl.replace(
             `page=${req.query.page}`,
