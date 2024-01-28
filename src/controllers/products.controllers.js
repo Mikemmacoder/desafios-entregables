@@ -165,9 +165,12 @@ export const homeProductsController = async (req, res) => {
       totalPages.push({ page: index, link });
     }
     const user = req.user.user;
+    let products = result.response.payload
+    const productsInStock = products.filter(p =>  p.stock > 0 );
+
     res.render("home", {
       user,
-      products: result.response.payload,
+      products: productsInStock,
       paginateInfo: {
         hasPrevPage: result.response.hasPrevPage,
         hasNextPage: result.response.hasNextPage,

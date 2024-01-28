@@ -36,8 +36,6 @@ const initializePassport = () => {
             role: role || "user",
             cart: cartForNewUser
           };
-          console.log('user: ' + newUser)
-          console.log('user: ' + JSON.stringify(newUser, null, 2))
           const result = await UserService.create(newUser);
           return done(null, result );
         } catch (err) {
@@ -56,7 +54,7 @@ const initializePassport = () => {
       async (username, password, done) => {
         try {
           if (username === config.admin.email && password === config.admin.password) {
-            const cartForAdmin = await CartService.getById({ _id: '6536fce65e2cb6f12d2819f2'});
+            //const cartForAdmin = await CartService.getById({ _id: '6536fce65e2cb6f12d2819f2'});
             const user = {
               _id: "admin",
               email: config.admin.email,
@@ -65,20 +63,20 @@ const initializePassport = () => {
               first_name: "Coder",
               last_name: "House",
               age: "25",
-              cart: cartForAdmin._id,
+              //cart: cartForAdmin._id,
             };
             const tokenAdmin = generateToken(user)
             user.token = tokenAdmin
             return done(null, user);
           }
+          
           const user = await UserService.getByData({ email: username });
+          
+          if (!isValidPassword(user, password) || !user) return done(null, false);
           const data = { last_connection: new Date() }
           await UserService.update(user._id, data);
-
-          if (!isValidPassword(user, password) || !user) return done(null, false);
           const token = generateToken(user)
           user.token = token
-
           return done(null, user);
         } catch (err) {}
       }
@@ -94,15 +92,21 @@ const initializePassport = () => {
     try {
         const user = await UserService.getByData({ email: profile._json.email })
         if (user){
+          const data = { last_connection: new Date() }
+          await UserService.update(user._id, data);
           const token = generateToken(user)
           user.token = token
           return done(null, user)
         }
+        const cartForNewUser = await CartService.create()
         const newUser = await UserService.create({
             first_name: profile._json.name,
             last_name: '',
+            age: "",
             email: profile._json.email,
-            password: '', 
+            password: '',
+            cart: cartForNewUser,
+            last_connection: new Date(), 
         })
         const token = generateToken(newUser)
         newUser.token = token
@@ -131,7 +135,7 @@ passport.use('jwt', new JWTStrategy({
 
   passport.deserializeUser(async (id, done) => {
     if (id === "admin"){
-      const cartForAdmin = await CartService.getById('6536fce65e2cb6f12d2819f2');
+      //const cartForAdmin = await CartService.getById('6536fce65e2cb6f12d2819f2');
       const user = {
         _id: "admin",
         email: config.admin.email,
@@ -140,7 +144,7 @@ passport.use('jwt', new JWTStrategy({
         first_name: "Coder",
         last_name: "House",
         age: "25",
-        cart: cartForAdmin,
+        //cart: cartForAdmin,
       };
       done(null, user); 
     } else{
