@@ -25,12 +25,14 @@ import ticketsRouter from "./routers/tickets.router.js"
 import swaggerUiExpress from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import { program} from "./config/config.js";
+import cors from 'cors'
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
 app.use(errorHandler)
+app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5173/products'], credentials: true }))
 
 import exphbs from "express-handlebars";
 const hbs = exphbs.create({
@@ -47,6 +49,7 @@ app.use(
     secret: "secret",
     resave: true,
     saveUninitialized: true,
+    name: "mySessionCookie",
   })
 );
 app.set("views", "./src/views");
@@ -87,7 +90,7 @@ try {
   
   app.use("/", sessionViewRouter);
   app.use("/api/sessions", sessionRouter);
-  app.use("/api/products", productRouter);
+  app.use("/api/products", passportCall('jwt'),  productRouter);
   app.use("/api/carts", handlePolicies(['USER', 'PREMIUM']), cartRouter); 
   app.use("/api/tickets", ticketsRouter)
   app.use("/api/users", usersRouter)

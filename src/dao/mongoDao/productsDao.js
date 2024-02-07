@@ -7,7 +7,7 @@ export default class ProductMongoDAO {
     getAllPaginate = async(req, options) => {
       try {
         //const limit = parseInt(req.query.limit) || 10;
-        const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+        const limit = req.query.limit ? parseInt(req.query.limit) : 12;
 
         const page = parseInt(req.query.page) || 1;
         const paginateOptions = { lean: true, limit, page };
@@ -39,18 +39,33 @@ export default class ProductMongoDAO {
           );
           nextLink = `http://${req.hostname}:${PORT}${modifiedUrl}`;
         }
+        const totalPages = [];
+        let link;
+        for (let index = 1; index <= result.totalPages; index++) {
+          if (!req.query.page) {
+            link = `http://${req.hostname}:${PORT}${req.originalUrl}${req.originalUrl.includes('?') ? '&' : '?'}page=${index}`;
+          } else {
+            const modifiedUrl = req.originalUrl.replace(
+              `page=${req.query.page}`,
+              `page=${index}`
+            );
+            link = `http://${req.hostname}:${PORT}${modifiedUrl}`;
+          }
+          totalPages.push({ page: index, link });
+        }
         if (page > result.totalPages) {
           return {
             statusCode: 404,
             response: { status: "error", error: "not found" },
           }
+          
         }
         return {
           statusCode: 200,
           response: {
             status: "success",
             payload: result.docs,
-            totalPages: result.totalPages,
+            totalPages,
             prevPage: result.prevPage,
             nextPage: result.nextPage,
             page: result.page,
@@ -58,7 +73,7 @@ export default class ProductMongoDAO {
             hasNextPage: result.hasNextPage,
             prevLink: result.hasPrevPage ? prevLink : null,
             nextLink: result.hasNextPage ? nextLink : null,
-            totalPages0: result.totalPages == 0 && true,
+            //totalPages0: result.totalPages == 0 && true,
           },
         };
       } catch (err) {

@@ -94,3 +94,18 @@ export const sendEmail = async (email, subject, htmlMessage) => {
     return('Ocurrió un error: ' + err)
   }
 } 
+
+export const fechaLegible = (oldDate) => {
+  const opcionesDeFormato = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    timeZoneName: "short",
+  };
+  const fecha = new Date(oldDate);
+  const fechaLegible = fecha.toLocaleString("es-ES", opcionesDeFormato);
+  return fechaLegible
+}

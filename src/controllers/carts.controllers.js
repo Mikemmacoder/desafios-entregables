@@ -23,33 +23,38 @@ export const getCartController = async (req, res) => {
     const token = req.cookies[JWT_COOKIE_NAME];
     if (!token) {
       logger.error('Unauthorized to access cart')
-      return res.status(401).render('errors/base', { error: 'Unauthorized' });
+      //return res.status(401).render('errors/base', { error: 'Unauthorized' });
+      return res.status(401).json({ status: 'error', error: 'Unauthorized to access cart' })
     }
     const decodedToken = verifyToken(token);
     const id = decodedToken.user.cart || req.params.cid
     const result = await CartService.getProducts(id)
     if (result === null) {
       logger.error('Cart not found')
-      return {
+      /* return {
         statusCode: 404,
         response: { status: 'error', error: 'Not found' }
-      }
+      } */
+      return res.status(404).json({ status: 'error', error: 'Cart not found' });
     }
-    logger.info('User accessed to cart with id ' + id + ' . Products in cart: ' + result)
-    return {
+    logger.info('User accessed to cart with id ' + id + ' . Products in cart: ' + JSON.stringify(result,null,2))
+    /* return {
       statusCode: 200,
       response: { status: 'success', payload: result }
-    }
+    } */
+    return res.status(200).json({ status: 'success', payload: result });
   } catch (err) {
     logger.error(err.message)
-    return {
+    /* return {
       statusCode: 500,
       response: { status: 'error', error: err.message }
-  }
+    } */
+    return res.status(500).json({ status: 'error', error: err.message });
 }}
 
 export const addProductToCartController = async (req, res) => {
     try {
+        // const cid = req.params.cid;
         const cid = req.params.cid;
         const pid = req.params.pid;
         const decodedToken = verifyToken(req.cookies[JWT_COOKIE_NAME]);

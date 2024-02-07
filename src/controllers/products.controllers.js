@@ -11,7 +11,6 @@ import config from "../config/config.js";
 
 export const getProductsController = async (req, res) => {
     const result = await ProductService.getAllPaginate(req)
-    logger.info('Products are loaded')
     res.status(result.statusCode).json(result.response)
 }
 export const getProductController = async (req, res) => {

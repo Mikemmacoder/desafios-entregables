@@ -19,29 +19,23 @@ export const loginController =async (req, res) => {
           .status(400)
           .send({ status: "error", error: "Invalid credentials" });
       }
-      res.cookie(JWT_COOKIE_NAME, req.user.token).redirect("/products");
-}
+      //res.cookie(JWT_COOKIE_NAME, req.user.token).redirect("/products");
+      res.cookie(JWT_COOKIE_NAME, req.user.token).send(req.user)
+    }
 export const failLoginController =async (req, res) => {
     logger.error('Passport login failed')
     res.send({ error: "Passport login failed" })
 }
 export const logoutController =async (req, res) => {
-    req.session.destroy((err) => { // mantengo el req.destroy porque sino no me desloguea
-        if (err) {
-          logger.error(err);
-          res.status(500).render("errors/base", { error: err });
-        } else {
-          logger.info('User logged out')
-          res.clearCookie(JWT_COOKIE_NAME).redirect('/')
-        }
-    }) 
+    logger.info('User logged out')
+    res.clearCookie(JWT_COOKIE_NAME).redirect('/')
 } 
 export const githubLoginController =async (req, res) => {
   
 } 
 export const githubCallbackController =async (req, res) => {
     const user = req.user
-    req.session.user = user
+    //req.session.user = user
     logger.info('User logged in through github')
     res.cookie(JWT_COOKIE_NAME, req.user.token).redirect("/products")
     //grabo el user con token (generado en el passport.config) en una cookie, 
