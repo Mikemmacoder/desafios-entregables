@@ -125,8 +125,10 @@ export const realTimeProductsController =async (req, res) => {
       }
       totalPages.push({ page: index, link });
     }
+    const user= req.user.user
     if (result.statusCode === 200) {
       res.render("realTimeProducts", { 
+        user,
         products: result.response.payload, 
         paginateInfo: {
           hasPrevPage: result.response.hasPrevPage,

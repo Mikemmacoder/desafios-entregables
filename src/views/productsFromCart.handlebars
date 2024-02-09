@@ -33,7 +33,7 @@
       {{/each}}
     </tbody>
   </table>
-  <button onclick="finalizePurchase()">Finalizar compra</button>
+  <button onclick="payment()">Realizar compra</button>
 {{/if}}
 
 <a href="/products">< Volver a productos</a>
@@ -134,7 +134,24 @@ const finalizePurchase = (req, res) => {
       alert(`Compra finalizada con éxito\n Comprador: ${purchaser} \n Código de compra: ${code}\n Fecha de compra: ${purchase_datetime}\n Total: $${amount}`);
     })
 };
-
+const payment = () => {
+  const cid = {{{json cart._id}}};  
+  fetch(`/pay/create-checkout-session`, {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({ cartId: cid })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+      }
+      return response.json(); 
+    })
+    .then(result => { 
+      //console.log(result)
+      window.location.href = result.url
+    })
+};
 /////----------Socket----------/////
 
 socketCart.on("CartUpdated", (data) => {

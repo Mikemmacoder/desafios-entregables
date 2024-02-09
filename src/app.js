@@ -9,6 +9,7 @@ import sessionRouter from "./routers/sessionRouter.js";
 import chatRouter from './routers/chat.router.js'
 import mockRouter from './routers/mock.router.js'
 import viewUsersRouter from './routers/view.users.router.js'
+import paymentRouter from './routers/payments.router.js'
 import { Server } from "socket.io";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -94,9 +95,11 @@ try {
   app.use("/products", passportCall('jwt'), viewRouter);
   app.use("/carts", viewRouter);
   app.use("/users", viewUsersRouter);
+  app.use("/pay", paymentRouter)
   app.use("/chat", chatRouter);
   app.use("/mockingproducts", mockRouter);
   app.use('/loggerTest', loggerRouter) 
+
 
   socketServer.on("connection", (socket) => {
     logger.info(`Nuevo cliente conectado: ${socket.id}`);

@@ -1,0 +1,32 @@
+<h1>Gracias por tu compra</h1>
+    
+    <h2>Detalle de la compra:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre del Producto</th>
+                <th>Descripción del Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Precio Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each products}}
+            <tr>
+                <td>{{title}}</td>
+                <td>{{description}}</td>
+                <td>{{quantity}}</td>
+                <td>${{price}}</td>
+                <td>${{totalPrice}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <h3>Precio Total: ${{ticket.amount}}</h3>
+    <p>Número de Ticket: {{ticket.code}}</p>
+    <br>
+    <hr>
+    <p>Te enviamos un mail con el detalle de la compra al email {{ticket.purchaser}}</p>
+    <br><br><p><a href="/products">< Volver a productos</a></p>

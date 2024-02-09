@@ -26,15 +26,8 @@ export const failLoginController =async (req, res) => {
     res.send({ error: "Passport login failed" })
 }
 export const logoutController =async (req, res) => {
-    req.session.destroy((err) => { // mantengo el req.destroy porque sino no me desloguea
-        if (err) {
-          logger.error(err);
-          res.status(500).render("errors/base", { error: err });
-        } else {
-          logger.info('User logged out')
-          res.clearCookie(JWT_COOKIE_NAME).redirect('/')
-        }
-    }) 
+  logger.info('User logged out')
+  res.clearCookie(JWT_COOKIE_NAME).redirect('/')
 } 
 export const githubLoginController =async (req, res) => {
   

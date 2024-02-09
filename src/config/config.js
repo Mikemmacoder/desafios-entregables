@@ -37,5 +37,6 @@ export default {
         callbackURL: process.env.GITHUB_CALLBACK_URL 
     },
     environment: program.opts().mode,
-    persistence: process.env.PERSISTENCE || "FILE"
+    persistence: process.env.PERSISTENCE || "FILE",
+    stripe: process.env.SK_TEST_STRIPE
 }
