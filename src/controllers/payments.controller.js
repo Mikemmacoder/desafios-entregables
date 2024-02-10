@@ -26,9 +26,6 @@ export const createSession = async (req, res) => {
             productsToTicket.push({ product: productToPurchase._id, title: productToPurchase.title, description: productToPurchase.description, price: productToPurchase.price, quantity: cartToPurchase.products[index].quantity})
         }
     }
-    //console.log('productsToTicket: ' + JSON.stringify(productsToTicket, null, 2))
-   /*  const products =  await CartService.getProducts(cartId)
-    const productsList = products.products */
     const lineItems = productsToTicket.map(product => ({
         price_data: {
             product_data: {
@@ -36,17 +33,15 @@ export const createSession = async (req, res) => {
                 description: product.description
             },
             currency: 'usd',
-            unit_amount: product.price //Aquí se podría consumir una API para convertir pesos a dólares
+            unit_amount: product.price //TODO: consumir una API para convertir pesos a dólares
         },
         quantity: product.quantity
     }));
-    console.log('line_items   ' + JSON.stringify(lineItems,null,2))
     if (lineItems.length > 0) {
-
         const session = await stripe.checkout.sessions.create({
             line_items: lineItems,
             mode: 'payment',
-            success_url: 'http://localhost:8080/pay/success', //cambie la de success
+            success_url: 'http://localhost:8080/pay/success',
             cancel_url: 'http://localhost:8080/pay/cancel'
         }) 
         return res.json(session)
@@ -116,7 +111,6 @@ export const successSession = async (req, res) => {
         console.log(result)
         return res.status(201).render('checkoutDetail', {products: productsToTicket, amount, email: user.email})
     } catch(err) {
-        //return res.status(500).json({ status: 'error', error: err.message })
         return res.status(500).render('checkoutDetail', { status: 'error', error: err.message })
     }
 }

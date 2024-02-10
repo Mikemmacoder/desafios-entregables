@@ -95,7 +95,7 @@ try {
   app.use("/products", passportCall('jwt'), viewRouter);
   app.use("/carts", viewRouter);
   app.use("/users", viewUsersRouter);
-  app.use("/pay", paymentRouter)
+  app.use("/pay", handlePolicies(['USER', 'PREMIUM']), paymentRouter)
   app.use("/chat", chatRouter);
   app.use("/mockingproducts", mockRouter);
   app.use('/loggerTest', loggerRouter) 

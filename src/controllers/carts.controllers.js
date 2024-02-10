@@ -1,12 +1,8 @@
-import { CartService, UserService } from "../services/index.js";
+import { CartService} from "../services/index.js";
 import { ProductService } from "../services/index.js";
-import { TicketService } from "../services/index.js";
-import shortid from "shortid";
 import { JWT_COOKIE_NAME } from "../utils/utils.js";
 import { verifyToken } from "../utils/utils.js";
 import logger from "../utils/logger.js";
-import { sendEmail } from "../utils/utils.js";
-import { parse } from "dotenv";
 
 //-----controllers de api/carts-----
 export const createCartController = async (req, res) => {
@@ -288,77 +284,3 @@ export const getProductsFromCartController = async (req, res) => {
       //TODO: ahora el home renderiza productos, debería haber una pagina de bienvenida a la cual redireccionar
   }
 }
-
-export const purchaseController = async(req, res) => {
-  try {
-      const cid = req.user.cart// req.params.cid // 
-      const cartToPurchase = await CartService.getProducts(cid)
-      if (cartToPurchase === null) {
-          return res.status(404).json({ status: 'error', error: `Cart with id=${cid} Not found` })
-      }
-      let productsToTicket = []
-      let productsAfterPurchase = cartToPurchase.products
-      let amount = 0
-      for (let index = 0; index < cartToPurchase.products.length; index++) {
-          const productToPurchase = await ProductService.getById(cartToPurchase.products[index].product._id)
-          if (productToPurchase === null) {
-              return res.status(400).json({ status: 'error', error: `Product with id=${cartToPurchase.products[index].product._id} does not exist. We cannot purchase this product` })
-          }
-          if (cartToPurchase.products[index].quantity <= productToPurchase.stock) {
-//------------actualizamos el stock del producto que se está comprando
-              productToPurchase.stock -= cartToPurchase.products[index].quantity
-              await ProductService.update(productToPurchase._id, { stock: productToPurchase.stock })
-//------------eliminamos (del carrito) los productos que se han comparado (en memoria)
-              productsAfterPurchase = productsAfterPurchase.filter(item => item.product.toString() !== cartToPurchase.products[index].product.toString())
-//------------calculamos el amount (total del ticket)
-              amount += (productToPurchase.price * cartToPurchase.products[index].quantity)
-//------------colocamos el producto en el Ticket (en memoria)
-              productsToTicket.push({ title: productToPurchase.title, description: productToPurchase.description, price: productToPurchase.price, quantity: cartToPurchase.products[index].quantity, totalPrice: productToPurchase.price * cartToPurchase.products[index].quantity})
-          }
-      }
-      console.log('productsToTicket: ' + JSON.stringify(productsToTicket, null, 2))
-//----eliminamos (del carrito) los productos que se han comparado
-      await CartService.update(cid, { products: productsAfterPurchase }, { returnDocument: 'after' })
-//----creamos el Ticket
-      const user = await UserService.getByData({ cart: cartToPurchase })
-      const result = await TicketService.create({
-          code: shortid.generate(),
-          products: productsToTicket,
-          amount,
-          purchaser: user.email
-      })
-    
-//----Enviar email
-      const productsToTicketHTML = productsToTicket.map(p => `
-          <tr>
-              <td>${p.title}</td>
-              <td>${p.description}</td>
-              <td>${p.quantity}</td>
-              <td>${p.price}</td>
-              <td>${p.price * p.quantity}</td>
-          </tr>`
-      ).join('');
-      const subject = '[Ethereal] Compra confirmada';
-      const htmlMessage = `<h1>Tu compra en Ethereal ha sido exitosa!!!</h1><br/><p>Detalles</p><br/>Comprador: ${result.purchaser}<br/>Código de compra: ${result.code}<br/>Fecha de compra: ${result.purchase_datetime}<br/>
-        <table><thead><tr>
-                <th>Nombre del Producto</th>
-                <th>Descripción del Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Precio Total</th>
-            </tr></thead><tbody>${productsToTicketHTML}</tbody></table><br/>
-        <strong>Total: $${result.amount}</strong><br/><br/>Saludos,<br><strong>El equipo de Ethereal</strong>`
-      sendEmail(result.purchaser, subject, htmlMessage)
-
-      return res.status(201).render('checkoutDetail', {products: productsToTicket, ticket : parse(result)})
-  } catch(err) {
-      //return res.status(500).json({ status: 'error', error: err.message })
-      return res.status(500).render('checkoutDetail', { status: 'error', error: err.message })
-  }
-}
-
-export const chekoutController = async(req, res) => {
-  return res.render('checkout')
-
-}
-
