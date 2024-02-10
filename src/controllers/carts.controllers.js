@@ -337,22 +337,14 @@ export const purchaseController = async(req, res) => {
       ).join('');
       const subject = '[Ethereal] Compra confirmada';
       const htmlMessage = `<h1>Tu compra en Ethereal ha sido exitosa!!!</h1><br/><p>Detalles</p><br/>Comprador: ${result.purchaser}<br/>Código de compra: ${result.code}<br/>Fecha de compra: ${result.purchase_datetime}<br/>
-      <table>
-        <thead>
-            <tr>
+        <table><thead><tr>
                 <th>Nombre del Producto</th>
                 <th>Descripción del Producto</th>
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
                 <th>Precio Total</th>
-            </tr>
-        </thead>
-        <tbody>
-        ${productsToTicketHTML}
-          </tbody>
-    </table>
-    <br/>
-      <strong>Total: $${result.amount}</strong><br/><br/>Saludos,<br><strong>El equipo de Ethereal</strong>`
+            </tr></thead><tbody>${productsToTicketHTML}</tbody></table><br/>
+        <strong>Total: $${result.amount}</strong><br/><br/>Saludos,<br><strong>El equipo de Ethereal</strong>`
       sendEmail(result.purchaser, subject, htmlMessage)
 
       return res.status(201).render('checkoutDetail', {products: productsToTicket, ticket : parse(result)})

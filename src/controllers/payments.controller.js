@@ -38,21 +38,27 @@ export const createSession = async (req, res) => {
         },
         quantity: product.quantity
     }));
-    //console.log('line_items   ' + JSON.stringify(lineItems,null,2))   
-    const session = await stripe.checkout.sessions.create({
-        line_items: lineItems,
-        mode: 'payment',
-        success_url: 'http://localhost:8080/api/carts/:cid/purchase', //cambie la de success
-        cancel_url: 'http://localhost:8080/pay/cancel'
-    }) 
-    return res.json(session)
+    //console.log('line_items   ' + JSON.stringify(lineItems,null,2))
+    if (lineItems.length > 0) {
+
+        const session = await stripe.checkout.sessions.create({
+            line_items: lineItems,
+            mode: 'payment',
+            success_url: 'http://localhost:8080/api/carts/:cid/purchase', //cambie la de success
+            cancel_url: 'http://localhost:8080/pay/cancel'
+        }) 
+        return res.json(session)
+    }else{
+        return res.status(400).send({error: 'Has excedido el stock disponible de producto/s'})
+    }   
 }
-export const successSession = async (req, res) => {
+/* export const successSession = async (req, res) => {
     console.log('req.user: ' + JSON.stringify(req.user, null, 2))
 
     res.send('Compra realizada con éxito!!')
-}
+} */
 export const cancelSession = async (req, res) => {
-    
-    res.send('Cancelaste la compra, para retomarla haz click en el siguiente botón!')
+
+    console.log('req.user.cart: ' + JSON.stringify(req.user.cart, null, 2))
+    return res.status(201).render('checkoutCancel', {cid: req.user.cart})
 }

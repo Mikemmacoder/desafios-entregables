@@ -142,13 +142,13 @@ const payment = () => {
   body: JSON.stringify({ cartId: cid })
   })
     .then(response => {
-      if (!response.ok) {
+      if (response.status == 400) {
+        alert('Has excedido el stock disponible de producto/s')
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }
       return response.json(); 
     })
     .then(result => { 
-      //console.log(result)
       window.location.href = result.url
     })
 };
