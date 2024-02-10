@@ -79,16 +79,19 @@ export const addProductToCartController = async (req, res) => {
           (item) => item.product == pid
         );
         if (productIndex > -1) {
+          if(productToAdd.stock == cartToUpdate.products[productIndex].quantity){
+            return res.status(400).json({ status: 'error', error: 'Has alcanzado el máximo de productos disponibles' })
+          }
           cartToUpdate.products[productIndex].quantity += 1;
         } else {
           cartToUpdate.products.push({ product: pid, quantity: 1 });
         }
         const result = await CartService.update(cid, cartToUpdate, {new: true});
         logger.info(`Cart with id ${cid} updated`)
-        res.status(201).json({ status: "success", payload: result });
+        return res.status(201).json({ status: "success", payload: result });
       } catch (err) {
         logger.error(err.message)
-        res.status(500).json({ status: "error", error: err.message });
+        return res.status(500).json({ status: "error", error: err.message });
       }
 }
 export const deleteProductInCartController = async (req, res) => {
